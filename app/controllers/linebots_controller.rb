@@ -21,14 +21,14 @@ class LinebotsController < ApplicationController
           # デバックログ出力するために記述
           Amazon::Ecs.debug = true
           res1 = Amazon::Ecs.item_search(
-            input, # キーワードを入力
+            input, # キーワード指定
             search_index: 'All', # 抜きたいジャンルを指定
             response_group: 'BrowseNodes',
             country: 'jp'
           )
           browse_node_no = res1.items.first.get('BrowseNodes/BrowseNode/BrowseNodeId')
           res2 = Amazon::Ecs.item_search(
-            input, # キーワードを入力
+            input,
             browse_node: browse_node_no,
             response_group: 'ItemAttributes, Images',
             country: 'jp',
@@ -41,13 +41,13 @@ class LinebotsController < ApplicationController
             images << item.get('LargeImage/URL')
             break if i == 3
           end
-          message = [{
+          messages = [{
             type: 'text',
             text: titles[0]
-          # }, {
-          #   type: 'image',
-          #   originalContentUrl: images[0],
-          #   previewImageUrl: images[0]
+          }, {
+            type: 'image',
+            originalContentUrl: images[0],
+            previewImageUrl: images[0]
           }, {
             type: 'text',
             text: titles[1]
@@ -55,15 +55,11 @@ class LinebotsController < ApplicationController
             type: 'image',
             originalContentUrl: images[1],
             previewImageUrl: images[1]
-          # }, {
-          #   type: 'text',
-          #   text: titles[2]
           }, {
-            type: 'image',
-            originalContentUrl: images[2],
-            previewImageUrl: images[2]
+            type: 'text',
+            text: titles[2]
           }]
-          client.reply_message(event['replyToken'], message)
+          client.reply_message(event['replyToken'], messages)
         end
       end
     end
