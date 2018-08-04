@@ -30,7 +30,7 @@ class LinebotsController < ApplicationController
           i = 0
           ranks = res.items.map do |item|
             i += 1
-            "第#{i}位#{item.get('BrowseNode/BrowseNodeId')}"
+            "第#{i}位#{item.get('BrowseNodes/BrowseNode/BrowseNodeId')}"
           end
           message = [{
             type: 'text',
