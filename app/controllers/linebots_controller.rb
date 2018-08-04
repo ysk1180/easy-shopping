@@ -20,32 +20,34 @@ class LinebotsController < ApplicationController
           input = event.message['text']
           # デバックログ出力するために記述
           Amazon::Ecs.debug = true
-          res = Amazon::Ecs.item_search(
+          res1 = Amazon::Ecs.item_search(
             input, # キーワードを入力
             search_index: 'All', # 抜きたいジャンルを指定
             response_group: 'BrowseNodes',
-            country: 'jp',
+            country: 'jp'
           )
+          browse_node_no = res.items.first.get('BrowseNodes/BrowseNode/BrowseNodeId')
           res = Amazon::Ecs.item_search(
             input, # キーワードを入力
-            browse_node: res.items.first.get('BrowseNodes/BrowseNode/BrowseNodeId'),
+            browse_node: browse_node_no,
             response_group: 'ItemAttributes, Images',
             country: 'jp',
-            sort: 'salesrank', # ソート順を売上順に指定することでランキングとする
+            sort: 'salesrank' # ソート順を売上順に指定することでランキングとする
           )
           i = 0
           ranks = res.items.map do |item|
             i += 1
-            "＜#{i}位＞\n#{item.get('ItemAttributes/Title')}\n#{bitly_shorten(item.get('DetailPageURL'))}"
+            ["＜#{i}位＞\n#{item.get('ItemAttributes/Title')}\n#{bitly_shorten(item.get('DetailPageURL'))}", item.get('LargeImage/URL')]
+            break if i == 3
           end
-          url = res.items.first.get('LargeImage/URL')
+          # url = res.items.first.get('LargeImage/URL')
           message = [{
             type: 'text',
-            text: ranks[0]
+            text: ranks[0][0]
           },{
             type: 'image',
-            # originalContentUrl: url,
-            previewImageUrl: url
+            originalContentUrl: ranks[0][1],
+            previewImageUrl: ranks[0][1]
           }]
           client.reply_message(event['replyToken'], message)
         end
