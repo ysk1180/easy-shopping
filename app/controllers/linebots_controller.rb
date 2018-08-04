@@ -21,16 +21,16 @@ class LinebotsController < ApplicationController
           Amazon::Ecs.debug = true
           res = Amazon::Ecs.item_search(
             input, # キーワードを入力
-            # search_index: 'All', # 抜きたいジャンルを指定
-            browse_node: '16462091',
-            response_group: 'ItemAttributes, Variations',
+            search_index: 'All', # 抜きたいジャンルを指定
+            # browse_node: '16462091',
+            response_group: 'ItemAttributes, BrowseNode',
             country: 'jp',
-            sort: 'salesrank' # ソート順を売上順に指定することでランキングとする
+            # sort: 'salesrank' # ソート順を売上順に指定することでランキングとする
           )
           i = 0
           ranks = res.items.map do |item|
             i += 1
-            "第#{i}位#{item.get('ItemAttributes/Title')}"
+            "第#{i}位#{item.get('BrowseNode/Ancestors/BrowseNode/BrowseNodeId')}"
           end
           message = [{
             type: 'text',
