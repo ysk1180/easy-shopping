@@ -37,7 +37,7 @@ class LinebotsController < ApplicationController
           titles = []
           images = []
           res2.items.each.with_index(1) do |item, i|
-            titles << "＜#{i}位＞\n#{item.get('ItemAttributes/Title')}\n#{bitly_shorten(item.get('DetailPageURL'))}"
+            titles << "＜#{i}位＞\n#{item.get('ItemAttributes/Title')}\n#{bitly_shorten(item.get('DetailPageURL'))}\n#{item.get('ItemAttributes/ListPrice/FormattedPrice')}"
             images << item.get('LargeImage/URL')
             break if i == 3
           end
