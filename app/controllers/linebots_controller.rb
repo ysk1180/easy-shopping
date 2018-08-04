@@ -38,7 +38,7 @@ class LinebotsController < ApplicationController
             i += 1
             "＜#{i}位＞\n#{item.get('ItemAttributes/Title')}\n#{bitly_shorten(item.get('DetailPageURL'))}"
           end
-          url = res.items.first.get('LargeImage/URL')
+          url = res.items.first.get('SmallImage/URL')
           message = [{
             type: 'text',
             text: ranks[0]
