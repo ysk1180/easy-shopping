@@ -29,7 +29,7 @@ class LinebotsController < ApplicationController
           i = 0
           ranks = res.items.map do |item|
             i += 1
-            "第#{i}位#{item.get('ItemAttributes/Binding')}"
+            "第#{i}位#{item.get('ItemAttributes/ProductGroup')}"
           end
           message = [{
             type: 'text',
