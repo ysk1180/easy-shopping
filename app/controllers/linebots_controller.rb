@@ -44,10 +44,10 @@ class LinebotsController < ApplicationController
           message = [{
             type: 'text',
             text: titles[0]
-          }, {
-            type: 'image',
-            originalContentUrl: images[0],
-            previewImageUrl: images[0]
+          # }, {
+          #   type: 'image',
+          #   originalContentUrl: images[0],
+          #   previewImageUrl: images[0]
           }, {
             type: 'text',
             text: titles[1]
