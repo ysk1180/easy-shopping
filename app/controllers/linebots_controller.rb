@@ -27,10 +27,18 @@ class LinebotsController < ApplicationController
             country: 'jp',
             # sort: 'salesrank' # ソート順を売上順に指定することでランキングとする
           )
+          res = Amazon::Ecs.item_search(
+            input, # キーワードを入力
+            # search_index: 'All', # 抜きたいジャンルを指定
+            browse_node: item.get('BrowseNodes/BrowseNode/BrowseNodeId'),
+            response_group: 'ItemAttributes, BrowseNodes',
+            country: 'jp',
+            # sort: 'salesrank' # ソート順を売上順に指定することでランキングとする
+          )
           i = 0
           ranks = res.items.map do |item|
             i += 1
-            "第#{i}位#{item.get('BrowseNodes/BrowseNode/BrowseNodeId')}"
+            "第#{i}位#{item.get('ItemAttributes/Title')}"
           end
           message = [{
             type: 'text',
