@@ -22,7 +22,7 @@ class LinebotsController < ApplicationController
           res = Amazon::Ecs.item_search(
             input, # キーワードを入力
             search_index: 'All', # 抜きたいジャンルを指定
-            response_group: 'ItemAttributes, Variations',
+            response_group: 'Variations/Item/ItemAttributes, Variations',
             country: 'jp',
             # sort: 'salesrank' # ソート順を売上順に指定することでランキングとする
           )
