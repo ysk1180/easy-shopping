@@ -48,20 +48,20 @@ class LinebotsController < ApplicationController
             type: 'image',
             originalContentUrl: images[0],
             previewImageUrl: images[0]
-          }, {
-            type: 'text',
-            text: titles[1]
-          }, {
-            type: 'image',
-            originalContentUrl: images[1],
-            previewImageUrl: images[1]
-          }, {
-            type: 'text',
-            text: titles[2]
-          }, {
-            type: 'image',
-            originalContentUrl: images[2],
-            previewImageUrl: images[2]
+          # }, {
+          #   type: 'text',
+          #   text: titles[1]
+          # }, {
+          #   type: 'image',
+          #   originalContentUrl: images[1],
+          #   previewImageUrl: images[1]
+          # }, {
+          #   type: 'text',
+          #   text: titles[2]
+          # }, {
+          #   type: 'image',
+          #   originalContentUrl: images[2],
+          #   previewImageUrl: images[2]
           }]
           client.reply_message(event['replyToken'], message)
         end
