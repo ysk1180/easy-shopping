@@ -36,7 +36,7 @@ class LinebotsController < ApplicationController
           i = 0
           ranks = res.items.map do |item|
             i += 1
-            "第#{i}位#{item.get('ItemAttributes/Title')} #{bitly_shorten(item.get('DetailPageURL'))}"
+            "＜#{i}位＞\n#{item.get('ItemAttributes/Title')}\n#{bitly_shorten(item.get('DetailPageURL'))}"
           end
           message = [{
             type: 'text',
