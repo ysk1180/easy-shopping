@@ -38,7 +38,7 @@ class LinebotsController < ApplicationController
           images = []
           res2.items.each.with_index(1) do |item, i|
             titles << "＜#{i}位＞\n#{item.get('ItemAttributes/Title')}\n#{bitly_shorten(item.get('DetailPageURL'))}"
-            images << item.get('MediumImage/URL')
+            images << item.get('LargeImage/URL')
             break if i == 3
           end
           message = [{
@@ -55,13 +55,13 @@ class LinebotsController < ApplicationController
             type: 'image',
             originalContentUrl: images[1],
             previewImageUrl: images[1]
-          }, {
-            type: 'text',
-            text: titles[2]
           # }, {
-          #   type: 'image',
-          #   originalContentUrl: images[2],
-          #   previewImageUrl: images[2]
+          #   type: 'text',
+          #   text: titles[2]
+          }, {
+            type: 'image',
+            originalContentUrl: images[2],
+            previewImageUrl: images[2]
           }]
           client.reply_message(event['replyToken'], message)
         end
