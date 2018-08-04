@@ -16,9 +16,23 @@ class LinebotsController < ApplicationController
       when Line::Bot::Event::Message
         case event.type
         when Line::Bot::Event::MessageType::Text
+          input = event.message['text']
+          # デバックログ出力するために記述
+          Amazon::Ecs.debug = true
+          res = Amazon::Ecs.item_search(
+            input, # キーワードを入力
+            search_index: '', # 抜きたいジャンルを指定
+            country: 'jp',
+            sort: 'salesrank' # ソート順を売上順に指定することでランキングとする
+          )
+          i = 0
+          ranks = res.items.map do |item|
+            i += 1
+            "第#{i}位#{item.get('ItemAttributes/Title')}"
+          end
           message = [{
             type: 'text',
-            text: 'テスト'
+            text: ranks[0]
           }]
           client.reply_message(event['replyToken'], message)
         end
