@@ -21,9 +21,9 @@ class LinebotsController < ApplicationController
           Amazon::Ecs.debug = true
           res = Amazon::Ecs.item_search(
             input, # キーワードを入力
-            search_index: 'Kitchen', # 抜きたいジャンルを指定
+            search_index: 'All', # 抜きたいジャンルを指定
             country: 'jp',
-            sort: 'salesrank' # ソート順を売上順に指定することでランキングとする
+            # sort: 'salesrank' # ソート順を売上順に指定することでランキングとする
           )
           i = 0
           ranks = res.items.map do |item|
