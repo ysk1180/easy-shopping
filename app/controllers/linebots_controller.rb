@@ -26,8 +26,8 @@ class LinebotsController < ApplicationController
             response_group: 'BrowseNodes',
             country: 'jp'
           )
-          browse_node_no = res.items.first.get('BrowseNodes/BrowseNode/BrowseNodeId')
-          res = Amazon::Ecs.item_search(
+          browse_node_no = res1.items.first.get('BrowseNodes/BrowseNode/BrowseNodeId')
+          res2 = Amazon::Ecs.item_search(
             input, # キーワードを入力
             browse_node: browse_node_no,
             response_group: 'ItemAttributes, Images',
@@ -35,7 +35,7 @@ class LinebotsController < ApplicationController
             sort: 'salesrank' # ソート順を売上順に指定することでランキングとする
           )
           i = 0
-          ranks = res.items.map do |item|
+          ranks = res2.items.map do |item|
             i += 1
             ["＜#{i}位＞\n#{item.get('ItemAttributes/Title')}\n#{bitly_shorten(item.get('DetailPageURL'))}", item.get('LargeImage/URL')]
             break if i == 3
