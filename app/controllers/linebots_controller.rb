@@ -37,7 +37,7 @@ class LinebotsController < ApplicationController
           titles = []
           images = []
           res2.items.each.with_index(1) do |item, i|
-            titles << "＜#{i}位＞\n#{item.get('ItemAttributes/Title')}\n#{item.get('ItemAttributes/ListPrice/FormattedPrice')}\n#{item.get('OfferSummary/LowestNewPrice/FormattedPrice')}\n#{bitly_shorten(item.get('DetailPageURL'))}"
+            titles << "＜#{i}位＞\n#{item.get('ItemAttributes/Title')}\n#{choice_price(item.get('ItemAttributes/ListPrice/FormattedPrice'), item.get('OfferSummary/LowestNewPrice/FormattedPrice'))}\n#{bitly_shorten(item.get('DetailPageURL'))}"
             images << item.get('LargeImage/URL')
             break if i == 3
           end
@@ -82,5 +82,9 @@ class LinebotsController < ApplicationController
       config.access_token = ENV['BITLY_ACCESS_TOKEN']
     end
     Bitly.client.shorten(url).short_url
+  end
+
+  def choice_price(amazon_price, other_price)
+    amazon_price.present? ? amazon_price : other_price
   end
 end
