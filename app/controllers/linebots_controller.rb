@@ -30,14 +30,14 @@ class LinebotsController < ApplicationController
           res2 = Amazon::Ecs.item_search(
             input,
             browse_node: browse_node_no,
-            response_group: 'ItemAttributes, Images',
+            response_group: 'ItemAttributes, Images, Offers',
             country: 'jp',
             sort: 'salesrank' # ソート順を売上順に指定することでランキングとする
           )
           titles = []
           images = []
           res2.items.each.with_index(1) do |item, i|
-            titles << "＜#{i}位＞\n#{item.get('ItemAttributes/Title')}\n#{item.get('ItemAttributes/ListPrice/FormattedPrice')}\n#{bitly_shorten(item.get('DetailPageURL'))}"
+            titles << "＜#{i}位＞\n#{item.get('ItemAttributes/Title')}\n#{item.get('ItemAttributes/ListPrice/FormattedPrice')}\n#{item.get('OfferSummary/LowestNewPrice/FormattedPrice')}\n#{bitly_shorten(item.get('DetailPageURL'))}"
             images << item.get('LargeImage/URL')
             break if i == 3
           end
