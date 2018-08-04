@@ -33,7 +33,7 @@ class LinebotsController < ApplicationController
             browse_node: res.items.first.get('BrowseNodes/BrowseNode/BrowseNodeId'),
             response_group: 'ItemAttributes, BrowseNodes',
             country: 'jp',
-            # sort: 'salesrank' # ソート順を売上順に指定することでランキングとする
+            sort: 'salesrank' # ソート順を売上順に指定することでランキングとする
           )
           i = 0
           ranks = res.items.map do |item|
