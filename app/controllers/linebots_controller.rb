@@ -31,14 +31,14 @@ class LinebotsController < ApplicationController
             input, # キーワードを入力
             # search_index: 'All', # 抜きたいジャンルを指定
             browse_node: res.items.first.get('BrowseNodes/BrowseNode/BrowseNodeId'),
-            response_group: 'ItemAttributes, BrowseNodes',
+            response_group: 'ItemAttributes, Images',
             country: 'jp',
             sort: 'salesrank' # ソート順を売上順に指定することでランキングとする
           )
           i = 0
           ranks = res.items.map do |item|
             i += 1
-            "第#{i}位#{item.get('ItemAttributes/Title')} #{item.get('DetailPageURL')}"
+            "第#{i}位#{item.get('ItemAttributes/Title')} #{item.get('DetailPageURL')} #{item.get('LargeImage/URL')}"
           end
           message = [{
             type: 'text',
