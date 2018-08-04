@@ -39,3 +39,5 @@ gem 'dotenv-rails'
 gem 'line-bot-api'
 
 gem 'amazon-ecs'
+
+gem 'bitly'
