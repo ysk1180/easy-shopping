@@ -34,20 +34,19 @@ class LinebotsController < ApplicationController
             country: 'jp',
             sort: 'salesrank' # ソート順を売上順に指定することでランキングとする
           )
-          i = 0
-          ranks = res2.items.map do |item|
-            i += 1
-            ["＜#{i}位＞\n#{item.get('ItemAttributes/Title')}\n#{bitly_shorten(item.get('DetailPageURL'))}", item.get('LargeImage/URL')]
+          res2.items.each.with_index(1) do |item, i|
+            titles << "＜#{i}位＞\n#{item.get('ItemAttributes/Title')}\n#{bitly_shorten(item.get('DetailPageURL'))}"
+            images << item.get('LargeImage/URL')
             break if i == 3
           end
-          # url = res.items.first.get('LargeImage/URL')
+          # url = res.items.first
           message = [{
             type: 'text',
-            text: ranks[0][0]
-          },{
+            text: titles[0]
+          }, {
             type: 'image',
-            originalContentUrl: ranks[0][1],
-            previewImageUrl: ranks[0][1]
+            originalContentUrl: images[0],
+            previewImageUrl: images[0]
           }]
           client.reply_message(event['replyToken'], message)
         end
