@@ -30,7 +30,7 @@ class LinebotsController < ApplicationController
           res2 = Amazon::Ecs.item_search(
             input,
             browse_node: browse_node_no,
-            response_group: 'ItemAttributes, Images, Offers, CustomerReviews',
+            response_group: 'ItemAttributes, Images, Offers, Reviews',
             country: 'jp',
             sort: 'salesrank' # ソート順を売上順に指定することでランキングとする
           )
