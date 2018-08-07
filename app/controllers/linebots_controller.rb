@@ -46,7 +46,8 @@ class LinebotsController < ApplicationController
             images << item.get('LargeImage/URL')
             break if i == 3
           end
-          messages = [
+          messages = 
+            # [
             {
               "type": "carousel",
               "contents": [
@@ -259,7 +260,7 @@ class LinebotsController < ApplicationController
             #   type: 'text',
             #   text: titles[2]
             # }
-          ]
+          # ]
           client.reply_message(event['replyToken'], messages)
         end
       end
