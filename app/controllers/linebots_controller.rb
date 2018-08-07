@@ -44,7 +44,7 @@ class LinebotsController < ApplicationController
             # titles << item.get('ItemAttributes/Title')
             # prices << choice_price(item.get('ItemAttributes/ListPrice/FormattedPrice'), item.get('OfferSummary/LowestNewPrice/FormattedPrice'))
             # urls << item.get('DetailPageURL')
-            # images << item.get('LargeImage/URL')
+            images << item.get('LargeImage/URL')
 
             break if i == 3
           end
