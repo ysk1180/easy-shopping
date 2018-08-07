@@ -39,232 +39,236 @@ class LinebotsController < ApplicationController
           prices = []
           urls = []
           res2.items.each.with_index(1) do |item, i|
-            titles << "＜#{i}位＞\n#{item.get('ItemAttributes/Title')}\n#{choice_price(item.get('ItemAttributes/ListPrice/FormattedPrice'), item.get('OfferSummary/LowestNewPrice/FormattedPrice'))}\n#{bitly_shorten(item.get('DetailPageURL'))}"
-          
-            # titles << item.get('ItemAttributes/Title')
-            # prices << choice_price(item.get('ItemAttributes/ListPrice/FormattedPrice'), item.get('OfferSummary/LowestNewPrice/FormattedPrice'))
-            # urls << item.get('DetailPageURL')
+            # titles << "＜#{i}位＞\n#{item.get('ItemAttributes/Title')}\n#{choice_price(item.get('ItemAttributes/ListPrice/FormattedPrice'), item.get('OfferSummary/LowestNewPrice/FormattedPrice'))}\n#{bitly_shorten(item.get('DetailPageURL'))}"
+
+            titles << item.get('ItemAttributes/Title')
+            prices << choice_price(item.get('ItemAttributes/ListPrice/FormattedPrice'), item.get('OfferSummary/LowestNewPrice/FormattedPrice'))
+            urls << item.get('DetailPageURL')
             images << item.get('LargeImage/URL')
 
             break if i == 3
           end
           messages = 
-            [
-
-            # {
-            #   "type": "carousel",
-            #   "contents": [
-            #     {
-            #       "type": "bubble",
-            #       "hero": {
-            #         "type": "image",
-            #         "size": "full",
-            #         "aspectRatio": "20:13",
-            #         "aspectMode": "cover",
-            #         "url": images[0]
-            #       },
-            #       "body":
-            #       {
-            #         "type": "box",
-            #         "layout": "vertical",
-            #         "spacing": "sm",
-            #         "contents": [
-            #           {
-            #             "type": "text",
-            #             "text": titles[0],
-            #             "wrap": true,
-            #             "weight": "bold",
-            #             "size": "xl"
-            #           },
-            #           {
-            #             "type": "box",
-            #             "layout": "baseline",
-            #             "contents": [
-            #               {
-            #                 "type": "text",
-            #                 "text": prices[0],
-            #                 "wrap": true,
-            #                 "weight": "bold",
-            #                 "size": "xl",
-            #                 "flex": 0
-            #               }
-            #             ]
-            #           },{
-            #             "type": "text",
-            #             "text": "1位",
-            #             "wrap": true,
-            #             "size": "xs",
-            #             "margin": "md",
-            #             "color": "#ff5551",
-            #             "flex": 0
-            #           }
-            #         ]
-            #       },
-            #       "footer": {
-            #         "type": "box",
-            #         "layout": "vertical",
-            #         "spacing": "sm",
-            #         "contents": [
-            #           {
-            #             "type": "button",
-            #             "style": "primary",
-            #             "action": {
-            #               "type": "uri",
-            #               "label": "Amazon商品ページへ",
-            #               "uri": urls[0]
-            #             }
-            #           }
-            #         ]
-            #       }
-            #     },
-            #     {
-            #       "type": "bubble",
-            #       "hero": {
-            #         "type": "image",
-            #         "size": "full",
-            #         "aspectRatio": "20:13",
-            #         "aspectMode": "cover",
-            #         "url": images[1]
-            #       },
-            #       "body":
-            #       {
-            #         "type": "box",
-            #         "layout": "vertical",
-            #         "spacing": "sm",
-            #         "contents": [
-            #           {
-            #             "type": "text",
-            #             "text": titles[1],
-            #             "wrap": true,
-            #             "weight": "bold",
-            #             "size": "xl"
-            #           },
-            #           {
-            #             "type": "box",
-            #             "layout": "baseline",
-            #             "contents": [
-            #               {
-            #                 "type": "text",
-            #                 "text": prices[1],
-            #                 "wrap": true,
-            #                 "weight": "bold",
-            #                 "size": "xl",
-            #                 "flex": 0
-            #               }
-            #             ]
-            #           },{
-            #             "type": "text",
-            #             "text": "2位",
-            #             "wrap": true,
-            #             "size": "xs",
-            #             "margin": "md",
-            #             "color": "#ff5551",
-            #             "flex": 0
-            #           }
-            #         ]
-            #       },
-            #       "footer": {
-            #         "type": "box",
-            #         "layout": "vertical",
-            #         "spacing": "sm",
-            #         "contents": [
-            #           {
-            #             "type": "button",
-            #             "style": "primary",
-            #             "action": {
-            #               "type": "uri",
-            #               "label": "Amazon商品ページへ",
-            #               "uri": urls[1]
-            #             }
-            #           }
-            #         ]
-            #       }
-            #     },
-            #     {
-            #       "type": "bubble",
-            #       "hero": {
-            #         "type": "image",
-            #         "size": "full",
-            #         "aspectRatio": "20:13",
-            #         "aspectMode": "cover",
-            #         "url": images[2]
-            #       },
-            #       "body":
-            #       {
-            #         "type": "box",
-            #         "layout": "vertical",
-            #         "spacing": "sm",
-            #         "contents": [
-            #           {
-            #             "type": "text",
-            #             "text": titles[2],
-            #             "wrap": true,
-            #             "weight": "bold",
-            #             "size": "xl"
-            #           },
-            #           {
-            #             "type": "box",
-            #             "layout": "baseline",
-            #             "contents": [
-            #               {
-            #                 "type": "text",
-            #                 "text": prices[2],
-            #                 "wrap": true,
-            #                 "weight": "bold",
-            #                 "size": "xl",
-            #                 "flex": 0
-            #               }
-            #             ]
-            #           },{
-            #             "type": "text",
-            #             "text": "3位",
-            #             "wrap": true,
-            #             "size": "xs",
-            #             "margin": "md",
-            #             "color": "#ff5551",
-            #             "flex": 0
-            #           }
-            #         ]
-            #       },
-            #       "footer": {
-            #         "type": "box",
-            #         "layout": "vertical",
-            #         "spacing": "sm",
-            #         "contents": [
-            #           {
-            #             "type": "button",
-            #             "style": "primary",
-            #             "action": {
-            #               "type": "uri",
-            #               "label": "Amazon商品ページへ",
-            #               "uri": urls[2]
-            #             }
-            #           }
-            #         ]
-            #       }
-            #     }
-            #   ]
-            # }
-
+            # [
+            {
+              "type": "flex",
+              "altText": "This is a Flex Message",
+              "contents": 
               {
-              type: 'text',
-              text: titles[0]
-            }, {
-              type: 'image',
-              originalContentUrl: images[0],
-              previewImageUrl: images[0]
-            }, {
-              type: 'text',
-              text: titles[1]
-            }, {
-              type: 'image',
-              originalContentUrl: images[1],
-              previewImageUrl: images[1]
-            }, {
-              type: 'text',
-              text: titles[2]
-            }
-          ]
+                "type": "carousel",
+                "contents": [
+                  {
+                    "type": "bubble",
+                    "hero": {
+                      "type": "image",
+                      "size": "full",
+                      "aspectRatio": "20:13",
+                      "aspectMode": "cover",
+                      "url": images[0]
+                    },
+                    "body":
+                    {
+                      "type": "box",
+                      "layout": "vertical",
+                      "spacing": "sm",
+                      "contents": [
+                        {
+                          "type": "text",
+                          "text": titles[0],
+                          "wrap": true,
+                          "weight": "bold",
+                          "size": "xl"
+                        },
+                        {
+                          "type": "box",
+                          "layout": "baseline",
+                          "contents": [
+                            {
+                              "type": "text",
+                              "text": prices[0],
+                              "wrap": true,
+                              "weight": "bold",
+                              "size": "xl",
+                              "flex": 0
+                            }
+                          ]
+                        },{
+                          "type": "text",
+                          "text": "1位",
+                          "wrap": true,
+                          "size": "xs",
+                          "margin": "md",
+                          "color": "#ff5551",
+                          "flex": 0
+                        }
+                      ]
+                    },
+                    "footer": {
+                      "type": "box",
+                      "layout": "vertical",
+                      "spacing": "sm",
+                      "contents": [
+                        {
+                          "type": "button",
+                          "style": "primary",
+                          "action": {
+                            "type": "uri",
+                            "label": "Amazon商品ページへ",
+                            "uri": urls[0]
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "type": "bubble",
+                    "hero": {
+                      "type": "image",
+                      "size": "full",
+                      "aspectRatio": "20:13",
+                      "aspectMode": "cover",
+                      "url": images[1]
+                    },
+                    "body":
+                    {
+                      "type": "box",
+                      "layout": "vertical",
+                      "spacing": "sm",
+                      "contents": [
+                        {
+                          "type": "text",
+                          "text": titles[1],
+                          "wrap": true,
+                          "weight": "bold",
+                          "size": "xl"
+                        },
+                        {
+                          "type": "box",
+                          "layout": "baseline",
+                          "contents": [
+                            {
+                              "type": "text",
+                              "text": prices[1],
+                              "wrap": true,
+                              "weight": "bold",
+                              "size": "xl",
+                              "flex": 0
+                            }
+                          ]
+                        },{
+                          "type": "text",
+                          "text": "2位",
+                          "wrap": true,
+                          "size": "xs",
+                          "margin": "md",
+                          "color": "#ff5551",
+                          "flex": 0
+                        }
+                      ]
+                    },
+                    "footer": {
+                      "type": "box",
+                      "layout": "vertical",
+                      "spacing": "sm",
+                      "contents": [
+                        {
+                          "type": "button",
+                          "style": "primary",
+                          "action": {
+                            "type": "uri",
+                            "label": "Amazon商品ページへ",
+                            "uri": urls[1]
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "type": "bubble",
+                    "hero": {
+                      "type": "image",
+                      "size": "full",
+                      "aspectRatio": "20:13",
+                      "aspectMode": "cover",
+                      "url": images[2]
+                    },
+                    "body":
+                    {
+                      "type": "box",
+                      "layout": "vertical",
+                      "spacing": "sm",
+                      "contents": [
+                        {
+                          "type": "text",
+                          "text": titles[2],
+                          "wrap": true,
+                          "weight": "bold",
+                          "size": "xl"
+                        },
+                        {
+                          "type": "box",
+                          "layout": "baseline",
+                          "contents": [
+                            {
+                              "type": "text",
+                              "text": prices[2],
+                              "wrap": true,
+                              "weight": "bold",
+                              "size": "xl",
+                              "flex": 0
+                            }
+                          ]
+                        },{
+                          "type": "text",
+                          "text": "3位",
+                          "wrap": true,
+                          "size": "xs",
+                          "margin": "md",
+                          "color": "#ff5551",
+                          "flex": 0
+                        }
+                      ]
+                    },
+                    "footer": {
+                      "type": "box",
+                      "layout": "vertical",
+                      "spacing": "sm",
+                      "contents": [
+                        {
+                          "type": "button",
+                          "style": "primary",
+                          "action": {
+                            "type": "uri",
+                            "label": "Amazon商品ページへ",
+                            "uri": urls[2]
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+          }
+
+          #     {
+          #     type: 'text',
+          #     text: titles[0]
+          #   }, {
+          #     type: 'image',
+          #     originalContentUrl: images[0],
+          #     previewImageUrl: images[0]
+          #   }, {
+          #     type: 'text',
+          #     text: titles[1]
+          #   }, {
+          #     type: 'image',
+          #     originalContentUrl: images[1],
+          #     previewImageUrl: images[1]
+          #   }, {
+          #     type: 'text',
+          #     text: titles[2]
+          #   }
+          # ]
           client.reply_message(event['replyToken'], messages)
         end
       end
