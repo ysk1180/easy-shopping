@@ -88,7 +88,7 @@ class LinebotsController < ApplicationController
                               "text": prices[0],
                               "wrap": true,
                               "weight": "bold",
-                              "size": "xl",
+                              "size": "lg",
                               "flex": 0
                             }
                           ]
@@ -140,7 +140,7 @@ class LinebotsController < ApplicationController
                           "text": titles[1],
                           "wrap": true,
                           "weight": "bold",
-                          "size": "xl"
+                          "size": "lg"
                         },
                         {
                           "type": "box",
@@ -214,7 +214,7 @@ class LinebotsController < ApplicationController
                               "text": prices[2],
                               "wrap": true,
                               "weight": "bold",
-                              "size": "xl",
+                              "size": "lg",
                               "flex": 0
                             }
                           ]
