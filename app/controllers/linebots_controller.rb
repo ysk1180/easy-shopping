@@ -96,7 +96,7 @@ class LinebotsController < ApplicationController
                           "type": "text",
                           "text": "1位",
                           "wrap": true,
-                          "size": "xs",
+                          # "size": "xs",
                           "margin": "md",
                           "color": "#ff5551",
                           "flex": 0
@@ -159,7 +159,7 @@ class LinebotsController < ApplicationController
                           "type": "text",
                           "text": "2位",
                           "wrap": true,
-                          "size": "xs",
+                          # "size": "xs",
                           "margin": "md",
                           "color": "#ff5551",
                           "flex": 0
@@ -222,7 +222,7 @@ class LinebotsController < ApplicationController
                           "type": "text",
                           "text": "3位",
                           "wrap": true,
-                          "size": "xs",
+                          # "size": "xs",
                           "margin": "md",
                           "color": "#ff5551",
                           "flex": 0
