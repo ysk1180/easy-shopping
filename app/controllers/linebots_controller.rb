@@ -74,6 +74,15 @@ class LinebotsController < ApplicationController
                       "contents": [
                         {
                           "type": "text",
+                          "text": "1位",
+                          "wrap": true,
+                          # "size": "xs",
+                          "margin": "md",
+                          "color": "#ff5551",
+                          "flex": 0
+                        },
+                        {
+                          "type": "text",
                           "text": titles[0],
                           "wrap": true,
                           "weight": "bold",
@@ -92,16 +101,7 @@ class LinebotsController < ApplicationController
                               "flex": 0
                             }
                           ]
-                        },{
-                          "type": "text",
-                          "text": "1位",
-                          "wrap": true,
-                          # "size": "xs",
-                          "margin": "md",
-                          "color": "#ff5551",
-                          "flex": 0
-                        }
-                      ]
+                        }                      ]
                     },
                     "footer": {
                       "type": "box",
@@ -137,6 +137,14 @@ class LinebotsController < ApplicationController
                       "contents": [
                         {
                           "type": "text",
+                          "text": "2位",
+                          "wrap": true,
+                          # "size": "xs",
+                          "margin": "md",
+                          "color": "#ff5551",
+                          "flex": 0
+                        },{
+                          "type": "text",
                           "text": titles[1],
                           "wrap": true,
                           "weight": "bold",
@@ -155,14 +163,6 @@ class LinebotsController < ApplicationController
                               "flex": 0
                             }
                           ]
-                        },{
-                          "type": "text",
-                          "text": "2位",
-                          "wrap": true,
-                          # "size": "xs",
-                          "margin": "md",
-                          "color": "#ff5551",
-                          "flex": 0
                         }
                       ]
                     },
@@ -200,6 +200,15 @@ class LinebotsController < ApplicationController
                       "contents": [
                         {
                           "type": "text",
+                          "text": "3位",
+                          "wrap": true,
+                          # "size": "xs",
+                          "margin": "md",
+                          "color": "#ff5551",
+                          "flex": 0
+                        },
+                        {
+                          "type": "text",
                           "text": titles[2],
                           "wrap": true,
                           "weight": "bold",
@@ -218,16 +227,7 @@ class LinebotsController < ApplicationController
                               "flex": 0
                             }
                           ]
-                        },{
-                          "type": "text",
-                          "text": "3位",
-                          "wrap": true,
-                          # "size": "xs",
-                          "margin": "md",
-                          "color": "#ff5551",
-                          "flex": 0
-                        }
-                      ]
+                        }                      ]
                     },
                     "footer": {
                       "type": "box",
