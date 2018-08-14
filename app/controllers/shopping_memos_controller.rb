@@ -45,7 +45,7 @@ class ShoppingMemosController < ApplicationController
             prices << choice_price(item.get('ItemAttributes/ListPrice/FormattedPrice'), item.get('OfferSummary/LowestNewPrice/FormattedPrice'))
             urls << bitly_shorten(item.get('DetailPageURL'))
             images << item.get('LargeImage/URL')
-            break if i == 3
+            break if i == 1
           end
           messages =
             {
@@ -114,133 +114,6 @@ class ShoppingMemosController < ApplicationController
                             "type": 'uri',
                             "label": 'Amazon商品ページへ',
                             "uri": urls[0]
-                          }
-                        }
-                      ]
-                    }
-                  },
-                  {
-                    "type": 'bubble',
-                    "hero": {
-                      "type": 'image',
-                      "size": 'full',
-                      "aspectRatio": '20:13',
-                      "aspectMode": 'cover',
-                      "url": images[1]
-                    },
-                    "body":
-                    {
-                      "type": 'box',
-                      "layout": 'vertical',
-                      "spacing": 'sm',
-                      "contents": [
-                        {
-                          "type": 'text',
-                          "text": '2位',
-                          "wrap": true,
-                          # "size": "xs",
-                          "margin": 'md',
-                          "color": '#ff5551',
-                          "flex": 0
-                        }, {
-                          "type": 'text',
-                          "text": titles[1],
-                          "wrap": true,
-                          "weight": 'bold',
-                          "size": 'lg'
-                        },
-                        {
-                          "type": 'box',
-                          "layout": 'baseline',
-                          "contents": [
-                            {
-                              "type": 'text',
-                              "text": prices[1],
-                              "wrap": true,
-                              "weight": 'bold',
-                              # "size": "lg",
-                              "flex": 0
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    "footer": {
-                      "type": 'box',
-                      "layout": 'vertical',
-                      "spacing": 'sm',
-                      "contents": [
-                        {
-                          "type": 'button',
-                          "style": 'primary',
-                          "action": {
-                            "type": 'uri',
-                            "label": 'Amazon商品ページへ',
-                            "uri": urls[1]
-                          }
-                        }
-                      ]
-                    }
-                  },
-                  {
-                    "type": 'bubble',
-                    "hero": {
-                      "type": 'image',
-                      "size": 'full',
-                      "aspectRatio": '20:13',
-                      "aspectMode": 'cover',
-                      "url": images[2]
-                    },
-                    "body":
-                    {
-                      "type": 'box',
-                      "layout": 'vertical',
-                      "spacing": 'sm',
-                      "contents": [
-                        {
-                          "type": 'text',
-                          "text": '3位',
-                          "wrap": true,
-                          # "size": "xs",
-                          "margin": 'md',
-                          "color": '#ff5551',
-                          "flex": 0
-                        },
-                        {
-                          "type": 'text',
-                          "text": titles[2],
-                          "wrap": true,
-                          "weight": 'bold',
-                          "size": 'lg'
-                        },
-                        {
-                          "type": 'box',
-                          "layout": 'baseline',
-                          "contents": [
-                            {
-                              "type": 'text',
-                              "text": prices[2],
-                              "wrap": true,
-                              "weight": 'bold',
-                              # "size": "lg",
-                              "flex": 0
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    "footer": {
-                      "type": 'box',
-                      "layout": 'vertical',
-                      "spacing": 'sm',
-                      "contents": [
-                        {
-                          "type": 'button',
-                          "style": 'primary',
-                          "action": {
-                            "type": 'uri',
-                            "label": 'Amazon商品ページへ',
-                            "uri": urls[2]
                           }
                         }
                       ]
