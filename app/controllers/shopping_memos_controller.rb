@@ -45,7 +45,7 @@ class ShoppingMemosController < ApplicationController
             prices << choice_price(item.get('ItemAttributes/ListPrice/FormattedPrice'), item.get('OfferSummary/LowestNewPrice/FormattedPrice'))
             urls << bitly_shorten(item.get('DetailPageURL'))
             images << item.get('LargeImage/URL')
-            break if i == 1
+            break if i == 3
           end
           messages =
             {
