@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 class ShoppingMemosController < ApplicationController
   require 'line/bot'
   require 'bitly'
 
   # callbackアクションのCSRFトークン認証を無効
-  protect_from_forgery :except => [:callback]
+  protect_from_forgery except: [:callback]
 
   def callback
     body = request.body.read
@@ -39,81 +41,78 @@ class ShoppingMemosController < ApplicationController
           prices = []
           urls = []
           res2.items.each.with_index(1) do |item, i|
-            # titles << "＜#{i}位＞\n#{item.get('ItemAttributes/Title')}\n#{choice_price(item.get('ItemAttributes/ListPrice/FormattedPrice'), item.get('OfferSummary/LowestNewPrice/FormattedPrice'))}\n#{bitly_shorten(item.get('DetailPageURL'))}"
-
             titles << item.get('ItemAttributes/Title')
             prices << choice_price(item.get('ItemAttributes/ListPrice/FormattedPrice'), item.get('OfferSummary/LowestNewPrice/FormattedPrice'))
             urls << bitly_shorten(item.get('DetailPageURL'))
             images << item.get('LargeImage/URL')
-
-            break if i == 3
+            break if i == 1
           end
-          messages = 
-            # [
+          messages =
             {
-              "type": "flex",
-              "altText": "This is a Flex Message",
-              "contents": 
+              "type": 'flex',
+              "altText": 'This is a Flex Message',
+              "contents":
               {
-                "type": "carousel",
+                "type": 'carousel',
                 "contents": [
                   {
-                    "type": "bubble",
+                    "type": 'bubble',
                     "hero": {
-                      "type": "image",
-                      "size": "full",
-                      "aspectRatio": "20:13",
-                      "aspectMode": "cover",
+                      "type": 'image',
+                      "size": 'full',
+                      "aspectRatio": '20:13',
+                      "aspectMode": 'cover',
                       "url": images[0]
                     },
                     "body":
                     {
-                      "type": "box",
-                      "layout": "vertical",
-                      "spacing": "sm",
+                      "type": 'box',
+                      "layout": 'vertical',
+                      "spacing": 'sm',
                       "contents": [
                         {
-                          "type": "text",
-                          "text": "1位",
+                          "type": 'text',
+                          "text": '1位',
                           "wrap": true,
                           # "size": "xs",
-                          "margin": "md",
-                          "color": "#ff5551",
+                          "margin": 'md',
+                          "color": '#ff5551',
                           "flex": 0
                         },
                         {
-                          "type": "text",
+                          "type": 'text',
                           "text": titles[0],
                           "wrap": true,
-                          "weight": "bold",
-                          "size": "lg"
+                          "weight": 'bold',
+                          "size": 'lg'
                         },
                         {
-                          "type": "box",
-                          "layout": "baseline",
+                          "type": 'box',
+                          "layout": 'baseline',
                           "contents": [
                             {
-                              "type": "text",
+                              "type": 'text',
                               "text": prices[0],
                               "wrap": true,
-                              "weight": "bold",
+                              "weight": 'bold',
                               # "size": "lg",
                               "flex": 0
                             }
                           ]
-                        }                      ]
+                        }
+                      ]
                     },
                     "footer": {
-                      "type": "box",
-                      "layout": "vertical",
-                      "spacing": "sm",
+                      "type": 'box',
+                      "layout": 'vertical',
+                      "spacing": 'sm',
                       "contents": [
                         {
-                          "type": "button",
-                          "style": "primary",
+                          "type": 'button',
+                          "style": 'primary',
                           "action": {
-                            "type": "uri",
-                            "label": "Amazon商品ページへ",
+                            "type": 'uri',
+                            "label": 'Amazon商品ページへ',
                             "uri": urls[0]
                           }
                         }
@@ -121,44 +120,44 @@ class ShoppingMemosController < ApplicationController
                     }
                   },
                   {
-                    "type": "bubble",
+                    "type": 'bubble',
                     "hero": {
-                      "type": "image",
-                      "size": "full",
-                      "aspectRatio": "20:13",
-                      "aspectMode": "cover",
+                      "type": 'image',
+                      "size": 'full',
+                      "aspectRatio": '20:13',
+                      "aspectMode": 'cover',
                       "url": images[1]
                     },
                     "body":
                     {
-                      "type": "box",
-                      "layout": "vertical",
-                      "spacing": "sm",
+                      "type": 'box',
+                      "layout": 'vertical',
+                      "spacing": 'sm',
                       "contents": [
                         {
-                          "type": "text",
-                          "text": "2位",
+                          "type": 'text',
+                          "text": '2位',
                           "wrap": true,
                           # "size": "xs",
-                          "margin": "md",
-                          "color": "#ff5551",
+                          "margin": 'md',
+                          "color": '#ff5551',
                           "flex": 0
-                        },{
-                          "type": "text",
+                        }, {
+                          "type": 'text',
                           "text": titles[1],
                           "wrap": true,
-                          "weight": "bold",
-                          "size": "lg"
+                          "weight": 'bold',
+                          "size": 'lg'
                         },
                         {
-                          "type": "box",
-                          "layout": "baseline",
+                          "type": 'box',
+                          "layout": 'baseline',
                           "contents": [
                             {
-                              "type": "text",
+                              "type": 'text',
                               "text": prices[1],
                               "wrap": true,
-                              "weight": "bold",
+                              "weight": 'bold',
                               # "size": "lg",
                               "flex": 0
                             }
@@ -167,16 +166,16 @@ class ShoppingMemosController < ApplicationController
                       ]
                     },
                     "footer": {
-                      "type": "box",
-                      "layout": "vertical",
-                      "spacing": "sm",
+                      "type": 'box',
+                      "layout": 'vertical',
+                      "spacing": 'sm',
                       "contents": [
                         {
-                          "type": "button",
-                          "style": "primary",
+                          "type": 'button',
+                          "style": 'primary',
                           "action": {
-                            "type": "uri",
-                            "label": "Amazon商品ページへ",
+                            "type": 'uri',
+                            "label": 'Amazon商品ページへ',
                             "uri": urls[1]
                           }
                         }
@@ -184,62 +183,63 @@ class ShoppingMemosController < ApplicationController
                     }
                   },
                   {
-                    "type": "bubble",
+                    "type": 'bubble',
                     "hero": {
-                      "type": "image",
-                      "size": "full",
-                      "aspectRatio": "20:13",
-                      "aspectMode": "cover",
+                      "type": 'image',
+                      "size": 'full',
+                      "aspectRatio": '20:13',
+                      "aspectMode": 'cover',
                       "url": images[2]
                     },
                     "body":
                     {
-                      "type": "box",
-                      "layout": "vertical",
-                      "spacing": "sm",
+                      "type": 'box',
+                      "layout": 'vertical',
+                      "spacing": 'sm',
                       "contents": [
                         {
-                          "type": "text",
-                          "text": "3位",
+                          "type": 'text',
+                          "text": '3位',
                           "wrap": true,
                           # "size": "xs",
-                          "margin": "md",
-                          "color": "#ff5551",
+                          "margin": 'md',
+                          "color": '#ff5551',
                           "flex": 0
                         },
                         {
-                          "type": "text",
+                          "type": 'text',
                           "text": titles[2],
                           "wrap": true,
-                          "weight": "bold",
-                          "size": "lg"
+                          "weight": 'bold',
+                          "size": 'lg'
                         },
                         {
-                          "type": "box",
-                          "layout": "baseline",
+                          "type": 'box',
+                          "layout": 'baseline',
                           "contents": [
                             {
-                              "type": "text",
+                              "type": 'text',
                               "text": prices[2],
                               "wrap": true,
-                              "weight": "bold",
+                              "weight": 'bold',
                               # "size": "lg",
                               "flex": 0
                             }
                           ]
-                        }                      ]
+                        }
+                      ]
                     },
                     "footer": {
-                      "type": "box",
-                      "layout": "vertical",
-                      "spacing": "sm",
+                      "type": 'box',
+                      "layout": 'vertical',
+                      "spacing": 'sm',
                       "contents": [
                         {
-                          "type": "button",
-                          "style": "primary",
+                          "type": 'button',
+                          "style": 'primary',
                           "action": {
-                            "type": "uri",
-                            "label": "Amazon商品ページへ",
+                            "type": 'uri',
+                            "label": 'Amazon商品ページへ',
                             "uri": urls[2]
                           }
                         }
@@ -248,27 +248,7 @@ class ShoppingMemosController < ApplicationController
                   }
                 ]
               }
-          }
-
-          #     {
-          #     type: 'text',
-          #     text: titles[0]
-          #   }, {
-          #     type: 'image',
-          #     originalContentUrl: images[0],
-          #     previewImageUrl: images[0]
-          #   }, {
-          #     type: 'text',
-          #     text: titles[1]
-          #   }, {
-          #     type: 'image',
-          #     originalContentUrl: images[1],
-          #     previewImageUrl: images[1]
-          #   }, {
-          #     type: 'text',
-          #     text: titles[2]
-          #   }
-          # ]
+            }
           client.reply_message(event['replyToken'], messages)
         end
       end
