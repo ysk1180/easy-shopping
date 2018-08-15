@@ -112,8 +112,7 @@ class ShoppingMemosController < ApplicationController
       price = choice_price(item.get('ItemAttributes/ListPrice/FormattedPrice'), item.get('OfferSummary/LowestNewPrice/FormattedPrice'))
       url = bitly_shorten(item.get('DetailPageURL'))
       image = item.get('LargeImage/URL')
-      array <<
-      {
+      array << {
         "type": 'bubble',
         "hero": {
           "type": 'image',
