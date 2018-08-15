@@ -175,7 +175,6 @@ class ShoppingMemosController < ApplicationController
             }
           ]
         }
-      },
-      array
+      }
   end
 end
