@@ -84,14 +84,14 @@ class ShoppingMemosController < ApplicationController
       {
         "type": 'carousel',
         "contents": [
-          create_content(things).all.join(', ')
+          create_content(things)
         ]
       }
     }
   end
 
   def create_content(things)
-    array = []
+    hash = {}
     things.each do |thing|
       res1 = Amazon::Ecs.item_search(
         thing, # キーワード指定
@@ -112,7 +112,7 @@ class ShoppingMemosController < ApplicationController
       price = choice_price(item.get('ItemAttributes/ListPrice/FormattedPrice'), item.get('OfferSummary/LowestNewPrice/FormattedPrice'))
       url = bitly_shorten(item.get('DetailPageURL'))
       image = item.get('LargeImage/URL')
-      array << {
+      array = {
         "type": 'bubble',
         "hero": {
           "type": 'image',
@@ -176,7 +176,8 @@ class ShoppingMemosController < ApplicationController
           ]
         }
       }
+    hash.merge!(array)
     end
-    array
+    hash
   end
 end
