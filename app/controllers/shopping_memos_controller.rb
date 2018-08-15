@@ -91,7 +91,8 @@ class ShoppingMemosController < ApplicationController
   end
 
   def create_content(things)
-    array = things.map do |thing|
+    array = [] 
+    things.each do |thing|
       res1 = Amazon::Ecs.item_search(
         thing, # キーワード指定
         search_index: 'All', # 抜きたいジャンルを指定
@@ -117,6 +118,7 @@ class ShoppingMemosController < ApplicationController
         images << item.get('LargeImage/URL')
         break if i == 1
       end
+      array <<
       {
         "type": 'bubble',
         "hero": {
