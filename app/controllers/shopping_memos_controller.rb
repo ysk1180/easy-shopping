@@ -84,14 +84,14 @@ class ShoppingMemosController < ApplicationController
       {
         "type": 'carousel',
         "contents": [
-          create_content(things).join(',')
+          create_content(things).join(', ')
         ]
       }
     }
   end
 
   def create_content(things)
-    array = [] 
+    array = []
     things.each do |thing|
       res1 = Amazon::Ecs.item_search(
         thing, # キーワード指定
@@ -112,10 +112,10 @@ class ShoppingMemosController < ApplicationController
       prices = []
       urls = []
       res2.items.each.with_index(1) do |item, i|
-        titles << item.get('ItemAttributes/Title')
-        prices << choice_price(item.get('ItemAttributes/ListPrice/FormattedPrice'), item.get('OfferSummary/LowestNewPrice/FormattedPrice'))
-        urls << bitly_shorten(item.get('DetailPageURL'))
-        images << item.get('LargeImage/URL')
+        title = item.get('ItemAttributes/Title')
+        price = choice_price(item.get('ItemAttributes/ListPrice/FormattedPrice'), item.get('OfferSummary/LowestNewPrice/FormattedPrice'))
+        url = bitly_shorten(item.get('DetailPageURL'))
+        image = item.get('LargeImage/URL')
         break if i == 1
       end
       array <<
@@ -126,7 +126,7 @@ class ShoppingMemosController < ApplicationController
           "size": 'full',
           "aspectRatio": '20:13',
           "aspectMode": 'cover',
-          "url": images[0]
+          "url": image
         },
         "body":
         {
@@ -145,7 +145,7 @@ class ShoppingMemosController < ApplicationController
             },
             {
               "type": 'text',
-              "text": titles[0],
+              "text": title,
               "wrap": true,
               "weight": 'bold',
               "size": 'lg'
@@ -156,7 +156,7 @@ class ShoppingMemosController < ApplicationController
               "contents": [
                 {
                   "type": 'text',
-                  "text": prices[0],
+                  "text": price,
                   "wrap": true,
                   "weight": 'bold',
                   # "size": "lg",
@@ -177,7 +177,7 @@ class ShoppingMemosController < ApplicationController
               "action": {
                 "type": 'uri',
                 "label": 'Amazon商品ページへ',
-                "uri": urls[0]
+                "uri": url
               }
             }
           ]
