@@ -23,7 +23,7 @@ class ShoppingMemosController < ApplicationController
           line_id = event['source']['userId']
           case input
           when /.*(買うもの).*/
-            thing = ShoppingMemo.where(line_id: line_id, alive: true).first
+            thing = ShoppingMemo.where(line_id: line_id, alive: true).first.thing
             message = create_message(thing)
           when /クリア/
             ShoppingMemo.where(line_id: line_id, alive: true).update_all(alive: false)
