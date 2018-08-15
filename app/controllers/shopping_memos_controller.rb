@@ -20,7 +20,24 @@ class ShoppingMemosController < ApplicationController
         case event.type
         when Line::Bot::Event::MessageType::Text
           input = event.message['text']
-          message = create_message(input)
+          line_id = event['source']['userId']
+          case input
+          when /.*(買うもの).*/
+            ShoppingMemo.create(thing: input, line_id: line_id)
+            message = {
+              type: 'text',
+              text: 'OK!'
+            }
+          when /クリア/
+            ShoppingMemo.where(line_id: line_id, alive: true).update_all(alive: false)
+            message = {
+              type: 'text',
+              text: 'クリアしたよ!'
+            }
+          else
+            thing = ShoppingMemo.where(line_id: line_id, alive: true).first
+            message = create_message(thing)
+          end
           client.reply_message(event['replyToken'], message)
         end
       end
