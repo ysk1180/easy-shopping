@@ -20,109 +20,8 @@ class ShoppingMemosController < ApplicationController
         case event.type
         when Line::Bot::Event::MessageType::Text
           input = event.message['text']
-          # デバックログ出力するために記述
-          Amazon::Ecs.debug = true
-          res1 = Amazon::Ecs.item_search(
-            input, # キーワード指定
-            search_index: 'All', # 抜きたいジャンルを指定
-            response_group: 'BrowseNodes',
-            country: 'jp'
-          )
-          browse_node_no = res1.items.first.get('BrowseNodes/BrowseNode/BrowseNodeId')
-          res2 = Amazon::Ecs.item_search(
-            input,
-            browse_node: browse_node_no,
-            response_group: 'ItemAttributes, Images, Offers',
-            country: 'jp',
-            sort: 'salesrank' # ソート順を売上順に指定することでランキングとする
-          )
-          titles = []
-          images = []
-          prices = []
-          urls = []
-          res2.items.each.with_index(1) do |item, i|
-            titles << item.get('ItemAttributes/Title')
-            prices << choice_price(item.get('ItemAttributes/ListPrice/FormattedPrice'), item.get('OfferSummary/LowestNewPrice/FormattedPrice'))
-            urls << bitly_shorten(item.get('DetailPageURL'))
-            images << item.get('LargeImage/URL')
-            break if i == 1
-          end
-          messages =
-            {
-              "type": 'flex',
-              "altText": 'This is a Flex Message',
-              "contents":
-              {
-                "type": 'carousel',
-                "contents": [
-                  {
-                    "type": 'bubble',
-                    "hero": {
-                      "type": 'image',
-                      "size": 'full',
-                      "aspectRatio": '20:13',
-                      "aspectMode": 'cover',
-                      "url": images[0]
-                    },
-                    "body":
-                    {
-                      "type": 'box',
-                      "layout": 'vertical',
-                      "spacing": 'sm',
-                      "contents": [
-                        {
-                          "type": 'text',
-                          "text": '1位',
-                          "wrap": true,
-                          # "size": "xs",
-                          "margin": 'md',
-                          "color": '#ff5551',
-                          "flex": 0
-                        },
-                        {
-                          "type": 'text',
-                          "text": titles[0],
-                          "wrap": true,
-                          "weight": 'bold',
-                          "size": 'lg'
-                        },
-                        {
-                          "type": 'box',
-                          "layout": 'baseline',
-                          "contents": [
-                            {
-                              "type": 'text',
-                              "text": prices[0],
-                              "wrap": true,
-                              "weight": 'bold',
-                              # "size": "lg",
-                              "flex": 0
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    "footer": {
-                      "type": 'box',
-                      "layout": 'vertical',
-                      "spacing": 'sm',
-                      "contents": [
-                        {
-                          "type": 'button',
-                          "style": 'primary',
-                          "action": {
-                            "type": 'uri',
-                            "label": 'Amazon商品ページへ',
-                            "uri": urls[0]
-                          }
-                        }
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          client.reply_message(event['replyToken'], messages)
+          message = create_message(input)
+          client.reply_message(event['replyToken'], message)
         end
       end
     end
@@ -149,5 +48,109 @@ class ShoppingMemosController < ApplicationController
 
   def choice_price(amazon_price, other_price)
     amazon_price.present? ? amazon_price : other_price
+  end
+
+  def create_message(input)
+    # デバックログ出力するために記述
+    Amazon::Ecs.debug = true
+    res1 = Amazon::Ecs.item_search(
+      input, # キーワード指定
+      search_index: 'All', # 抜きたいジャンルを指定
+      response_group: 'BrowseNodes',
+      country: 'jp'
+    )
+    browse_node_no = res1.items.first.get('BrowseNodes/BrowseNode/BrowseNodeId')
+    res2 = Amazon::Ecs.item_search(
+      input,
+      browse_node: browse_node_no,
+      response_group: 'ItemAttributes, Images, Offers',
+      country: 'jp',
+      sort: 'salesrank' # ソート順を売上順に指定することでランキングとする
+    )
+    titles = []
+    images = []
+    prices = []
+    urls = []
+    res2.items.each.with_index(1) do |item, i|
+      titles << item.get('ItemAttributes/Title')
+      prices << choice_price(item.get('ItemAttributes/ListPrice/FormattedPrice'), item.get('OfferSummary/LowestNewPrice/FormattedPrice'))
+      urls << bitly_shorten(item.get('DetailPageURL'))
+      images << item.get('LargeImage/URL')
+      break if i == 1
+    end
+    {
+      "type": 'flex',
+      "altText": 'This is a Flex Message',
+      "contents":
+      {
+        "type": 'carousel',
+        "contents": [
+          {
+            "type": 'bubble',
+            "hero": {
+              "type": 'image',
+              "size": 'full',
+              "aspectRatio": '20:13',
+              "aspectMode": 'cover',
+              "url": images[0]
+            },
+            "body":
+            {
+              "type": 'box',
+              "layout": 'vertical',
+              "spacing": 'sm',
+              "contents": [
+                {
+                  "type": 'text',
+                  "text": '1位',
+                  "wrap": true,
+                  # "size": "xs",
+                  "margin": 'md',
+                  "color": '#ff5551',
+                  "flex": 0
+                },
+                {
+                  "type": 'text',
+                  "text": titles[0],
+                  "wrap": true,
+                  "weight": 'bold',
+                  "size": 'lg'
+                },
+                {
+                  "type": 'box',
+                  "layout": 'baseline',
+                  "contents": [
+                    {
+                      "type": 'text',
+                      "text": prices[0],
+                      "wrap": true,
+                      "weight": 'bold',
+                      # "size": "lg",
+                      "flex": 0
+                    }
+                  ]
+                }
+              ]
+            },
+            "footer": {
+              "type": 'box',
+              "layout": 'vertical',
+              "spacing": 'sm',
+              "contents": [
+                {
+                  "type": 'button',
+                  "style": 'primary',
+                  "action": {
+                    "type": 'uri',
+                    "label": 'Amazon商品ページへ',
+                    "uri": urls[0]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
   end
 end
