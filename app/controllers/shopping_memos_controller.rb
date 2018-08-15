@@ -77,16 +77,23 @@ class ShoppingMemosController < ApplicationController
   def create_message(things)
     # デバックログ出力するために記述
     Amazon::Ecs.debug = true
-    input = things.first
+    {
+      "type": 'flex',
+      "altText": 'This is a Flex Message',
+      "contents":
+      {
+        "type": 'carousel',
+        "contents": [
+          things.each do |thing|
     res1 = Amazon::Ecs.item_search(
-      input, # キーワード指定
+      thing, # キーワード指定
       search_index: 'All', # 抜きたいジャンルを指定
       response_group: 'BrowseNodes',
       country: 'jp'
     )
     browse_node_no = res1.items.first.get('BrowseNodes/BrowseNode/BrowseNodeId')
     res2 = Amazon::Ecs.item_search(
-      input,
+      thing,
       browse_node: browse_node_no,
       response_group: 'ItemAttributes, Images, Offers',
       country: 'jp',
@@ -103,13 +110,6 @@ class ShoppingMemosController < ApplicationController
       images << item.get('LargeImage/URL')
       break if i == 1
     end
-    {
-      "type": 'flex',
-      "altText": 'This is a Flex Message',
-      "contents":
-      {
-        "type": 'carousel',
-        "contents": [
           {
             "type": 'bubble',
             "hero": {
@@ -174,6 +174,7 @@ class ShoppingMemosController < ApplicationController
               ]
             }
           }
+          end
         ]
       }
     }
