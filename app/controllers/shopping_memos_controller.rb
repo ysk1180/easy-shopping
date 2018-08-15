@@ -23,11 +23,8 @@ class ShoppingMemosController < ApplicationController
           line_id = event['source']['userId']
           case input
           when /.*(買うもの).*/
-            ShoppingMemo.create(thing: input, line_id: line_id)
-            message = {
-              type: 'text',
-              text: 'OK!'
-            }
+            thing = ShoppingMemo.where(line_id: line_id, alive: true).first
+            message = create_message(thing)
           when /クリア/
             ShoppingMemo.where(line_id: line_id, alive: true).update_all(alive: false)
             message = {
@@ -35,8 +32,11 @@ class ShoppingMemosController < ApplicationController
               text: 'クリアしたよ!'
             }
           else
-            thing = ShoppingMemo.where(line_id: line_id, alive: true).first
-            message = create_message(thing)
+            ShoppingMemo.create(thing: input, line_id: line_id)
+            message = {
+              type: 'text',
+              text: 'OK!'
+            }
           end
           client.reply_message(event['replyToken'], message)
         end
