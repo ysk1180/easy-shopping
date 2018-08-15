@@ -77,6 +77,20 @@ class ShoppingMemosController < ApplicationController
   def create_message(things)
     # デバックログ出力するために記述
     Amazon::Ecs.debug = true
+    {
+      "type": 'flex',
+      "altText": 'This is a Flex Message',
+      "contents":
+      {
+        "type": 'carousel',
+        "contents": [
+          create_content(things)
+        ]
+      }
+    }
+  end
+
+  def create_content(things)
     input = things.first
     res1 = Amazon::Ecs.item_search(
       input, # キーワード指定
@@ -104,74 +118,64 @@ class ShoppingMemosController < ApplicationController
       break if i == 1
     end
     {
-      "type": 'flex',
-      "altText": 'This is a Flex Message',
-      "contents":
+      "type": 'bubble',
+      "hero": {
+        "type": 'image',
+        "size": 'full',
+        "aspectRatio": '20:13',
+        "aspectMode": 'cover',
+        "url": images[0]
+      },
+      "body":
       {
-        "type": 'carousel',
+        "type": 'box',
+        "layout": 'vertical',
+        "spacing": 'sm',
         "contents": [
           {
-            "type": 'bubble',
-            "hero": {
-              "type": 'image',
-              "size": 'full',
-              "aspectRatio": '20:13',
-              "aspectMode": 'cover',
-              "url": images[0]
-            },
-            "body":
-            {
-              "type": 'box',
-              "layout": 'vertical',
-              "spacing": 'sm',
-              "contents": [
-                {
-                  "type": 'text',
-                  "text": '1位',
-                  "wrap": true,
-                  # "size": "xs",
-                  "margin": 'md',
-                  "color": '#ff5551',
-                  "flex": 0
-                },
-                {
-                  "type": 'text',
-                  "text": titles[0],
-                  "wrap": true,
-                  "weight": 'bold',
-                  "size": 'lg'
-                },
-                {
-                  "type": 'box',
-                  "layout": 'baseline',
-                  "contents": [
-                    {
-                      "type": 'text',
-                      "text": prices[0],
-                      "wrap": true,
-                      "weight": 'bold',
-                      # "size": "lg",
-                      "flex": 0
-                    }
-                  ]
-                }
-              ]
-            },
-            "footer": {
-              "type": 'box',
-              "layout": 'vertical',
-              "spacing": 'sm',
-              "contents": [
-                {
-                  "type": 'button',
-                  "style": 'primary',
-                  "action": {
-                    "type": 'uri',
-                    "label": 'Amazon商品ページへ',
-                    "uri": urls[0]
-                  }
-                }
-              ]
+            "type": 'text',
+            "text": '1位',
+            "wrap": true,
+            # "size": "xs",
+            "margin": 'md',
+            "color": '#ff5551',
+            "flex": 0
+          },
+          {
+            "type": 'text',
+            "text": titles[0],
+            "wrap": true,
+            "weight": 'bold',
+            "size": 'lg'
+          },
+          {
+            "type": 'box',
+            "layout": 'baseline',
+            "contents": [
+              {
+                "type": 'text',
+                "text": prices[0],
+                "wrap": true,
+                "weight": 'bold',
+                # "size": "lg",
+                "flex": 0
+              }
+            ]
+          }
+        ]
+      },
+      "footer": {
+        "type": 'box',
+        "layout": 'vertical',
+        "spacing": 'sm',
+        "contents": [
+          {
+            "type": 'button',
+            "style": 'primary',
+            "action": {
+              "type": 'uri',
+              "label": 'Amazon商品ページへ',
+              "uri": urls[0]
             }
           }
         ]
