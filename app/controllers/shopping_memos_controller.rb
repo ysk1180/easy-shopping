@@ -23,8 +23,15 @@ class ShoppingMemosController < ApplicationController
           line_id = event['source']['userId']
           case input
           when /.*(買うもの).*/
-            thing = ShoppingMemo.where(line_id: line_id, alive: true).first.thing
-            message = create_message(thing)
+            things = ShoppingMemo.where(line_id: line_id, alive: true).pluck(:thing)
+            if things.present?
+              message = create_message(things)
+            else
+              message = {
+                type: 'text',
+                text: '買うものはないよ〜'
+              }
+            end
           when /クリア/
             ShoppingMemo.where(line_id: line_id, alive: true).update_all(alive: false)
             message = {
