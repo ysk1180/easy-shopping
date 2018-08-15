@@ -84,7 +84,7 @@ class ShoppingMemosController < ApplicationController
       {
         "type": 'carousel',
         "contents": [
-          create_content(things).first
+          create_content(things).all.join(', ')
         ]
       }
     }
