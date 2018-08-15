@@ -107,17 +107,11 @@ class ShoppingMemosController < ApplicationController
         country: 'jp',
         sort: 'salesrank' # ソート順を売上順に指定することでランキングとする
       )
-      titles = []
-      images = []
-      prices = []
-      urls = []
-      res2.items.each.with_index(1) do |item, i|
-        title = item.get('ItemAttributes/Title')
-        price = choice_price(item.get('ItemAttributes/ListPrice/FormattedPrice'), item.get('OfferSummary/LowestNewPrice/FormattedPrice'))
-        url = bitly_shorten(item.get('DetailPageURL'))
-        image = item.get('LargeImage/URL')
-        break if i == 1
-      end
+      item = res2.items.first
+      title = item.get('ItemAttributes/Title')
+      price = choice_price(item.get('ItemAttributes/ListPrice/FormattedPrice'), item.get('OfferSummary/LowestNewPrice/FormattedPrice'))
+      url = bitly_shorten(item.get('DetailPageURL'))
+      image = item.get('LargeImage/URL')
       array <<
       {
         "type": 'bubble',
