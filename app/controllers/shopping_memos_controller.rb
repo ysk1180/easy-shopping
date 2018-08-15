@@ -84,15 +84,15 @@ class ShoppingMemosController < ApplicationController
       {
         "type": 'carousel',
         "contents": [
-          create_content(things)
+          things.each do |thing|
+          create_content(thing)
+          end
         ]
       }
     }
   end
 
-  def create_content(things)
-    hash = {}
-    things.each do |thing|
+  def create_content(thing)
       res1 = Amazon::Ecs.item_search(
         thing, # キーワード指定
         search_index: 'All', # 抜きたいジャンルを指定
@@ -175,9 +175,7 @@ class ShoppingMemosController < ApplicationController
             }
           ]
         }
-      }
-    hash.merge!(array)
-    end
-    hash
+      },
+      array
   end
 end
