@@ -74,9 +74,10 @@ class ShoppingMemosController < ApplicationController
     amazon_price.present? ? amazon_price : other_price
   end
 
-  def create_message(input)
+  def create_message(things)
     # デバックログ出力するために記述
     Amazon::Ecs.debug = true
+    input = things.first
     res1 = Amazon::Ecs.item_search(
       input, # キーワード指定
       search_index: 'All', # 抜きたいジャンルを指定
