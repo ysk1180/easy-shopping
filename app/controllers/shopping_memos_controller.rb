@@ -84,102 +84,104 @@ class ShoppingMemosController < ApplicationController
       {
         "type": 'carousel',
         "contents": [
-          create_content(things)
+          create_content(things).join(',')
         ]
       }
     }
   end
 
   def create_content(things)
-    input = things.first
-    res1 = Amazon::Ecs.item_search(
-      input, # キーワード指定
-      search_index: 'All', # 抜きたいジャンルを指定
-      response_group: 'BrowseNodes',
-      country: 'jp'
-    )
-    browse_node_no = res1.items.first.get('BrowseNodes/BrowseNode/BrowseNodeId')
-    res2 = Amazon::Ecs.item_search(
-      input,
-      browse_node: browse_node_no,
-      response_group: 'ItemAttributes, Images, Offers',
-      country: 'jp',
-      sort: 'salesrank' # ソート順を売上順に指定することでランキングとする
-    )
-    titles = []
-    images = []
-    prices = []
-    urls = []
-    res2.items.each.with_index(1) do |item, i|
-      titles << item.get('ItemAttributes/Title')
-      prices << choice_price(item.get('ItemAttributes/ListPrice/FormattedPrice'), item.get('OfferSummary/LowestNewPrice/FormattedPrice'))
-      urls << bitly_shorten(item.get('DetailPageURL'))
-      images << item.get('LargeImage/URL')
-      break if i == 1
-    end
-    {
-      "type": 'bubble',
-      "hero": {
-        "type": 'image',
-        "size": 'full',
-        "aspectRatio": '20:13',
-        "aspectMode": 'cover',
-        "url": images[0]
-      },
-      "body":
+    array = things.map do |thing|
+      res1 = Amazon::Ecs.item_search(
+        thing, # キーワード指定
+        search_index: 'All', # 抜きたいジャンルを指定
+        response_group: 'BrowseNodes',
+        country: 'jp'
+      )
+      browse_node_no = res1.items.first.get('BrowseNodes/BrowseNode/BrowseNodeId')
+      res2 = Amazon::Ecs.item_search(
+        thing,
+        browse_node: browse_node_no,
+        response_group: 'ItemAttributes, Images, Offers',
+        country: 'jp',
+        sort: 'salesrank' # ソート順を売上順に指定することでランキングとする
+      )
+      titles = []
+      images = []
+      prices = []
+      urls = []
+      res2.items.each.with_index(1) do |item, i|
+        titles << item.get('ItemAttributes/Title')
+        prices << choice_price(item.get('ItemAttributes/ListPrice/FormattedPrice'), item.get('OfferSummary/LowestNewPrice/FormattedPrice'))
+        urls << bitly_shorten(item.get('DetailPageURL'))
+        images << item.get('LargeImage/URL')
+        break if i == 1
+      end
       {
-        "type": 'box',
-        "layout": 'vertical',
-        "spacing": 'sm',
-        "contents": [
-          {
-            "type": 'text',
-            "text": '1位',
-            "wrap": true,
-            # "size": "xs",
-            "margin": 'md',
-            "color": '#ff5551',
-            "flex": 0
-          },
-          {
-            "type": 'text',
-            "text": titles[0],
-            "wrap": true,
-            "weight": 'bold',
-            "size": 'lg'
-          },
-          {
-            "type": 'box',
-            "layout": 'baseline',
-            "contents": [
-              {
-                "type": 'text',
-                "text": prices[0],
-                "wrap": true,
-                "weight": 'bold',
-                # "size": "lg",
-                "flex": 0
-              }
-            ]
-          }
-        ]
-      },
-      "footer": {
-        "type": 'box',
-        "layout": 'vertical',
-        "spacing": 'sm',
-        "contents": [
-          {
-            "type": 'button',
-            "style": 'primary',
-            "action": {
-              "type": 'uri',
-              "label": 'Amazon商品ページへ',
-              "uri": urls[0]
+        "type": 'bubble',
+        "hero": {
+          "type": 'image',
+          "size": 'full',
+          "aspectRatio": '20:13',
+          "aspectMode": 'cover',
+          "url": images[0]
+        },
+        "body":
+        {
+          "type": 'box',
+          "layout": 'vertical',
+          "spacing": 'sm',
+          "contents": [
+            {
+              "type": 'text',
+              "text": '1位',
+              "wrap": true,
+              # "size": "xs",
+              "margin": 'md',
+              "color": '#ff5551',
+              "flex": 0
+            },
+            {
+              "type": 'text',
+              "text": titles[0],
+              "wrap": true,
+              "weight": 'bold',
+              "size": 'lg'
+            },
+            {
+              "type": 'box',
+              "layout": 'baseline',
+              "contents": [
+                {
+                  "type": 'text',
+                  "text": prices[0],
+                  "wrap": true,
+                  "weight": 'bold',
+                  # "size": "lg",
+                  "flex": 0
+                }
+              ]
             }
-          }
-        ]
+          ]
+        },
+        "footer": {
+          "type": 'box',
+          "layout": 'vertical',
+          "spacing": 'sm',
+          "contents": [
+            {
+              "type": 'button',
+              "style": 'primary',
+              "action": {
+                "type": 'uri',
+                "label": 'Amazon商品ページへ',
+                "uri": urls[0]
+              }
+            }
+          ]
+        }
       }
-    }
+    end
+    array
   end
 end
