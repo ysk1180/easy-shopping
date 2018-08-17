@@ -84,8 +84,9 @@ class ShoppingMemosController < ApplicationController
       {
         "type": 'carousel',
         "contents": [
-          things.each do |thing|
-          create_content(thing)
+          things.each_with_index do |thing, i|
+            create_content(thing)
+            ',' if things(i+1).present?
           end
         ]
       }
