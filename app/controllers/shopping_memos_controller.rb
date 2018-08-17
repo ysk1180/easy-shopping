@@ -77,6 +77,7 @@ class ShoppingMemosController < ApplicationController
   def create_message(things)
     # デバックログ出力するために記述
     Amazon::Ecs.debug = true
+    t = things
     {
       "type": 'flex',
       "altText": 'This is a Flex Message',
@@ -86,7 +87,7 @@ class ShoppingMemosController < ApplicationController
         "contents": [
           things.each_with_index do |thing, i|
             create_content(thing)
-            ',' if things(i+1).present?
+            ',' if t(i+1).present?
           end
         ]
       }
