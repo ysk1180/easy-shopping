@@ -87,7 +87,7 @@ class ShoppingMemosController < ApplicationController
         "contents": [
           things.each_with_index do |thing, i|
             create_content(thing)
-            ',' if t(i+1).present?
+            ',' if t[i+1].present?
           end
         ]
       }
