@@ -22,16 +22,16 @@ class ShoppingMemosController < ApplicationController
           input = event.message['text']
           line_id = event['source']['userId']
           case input
-          when /.*(買うもの).*/
+          when /リスト/
             things = ShoppingMemo.where(line_id: line_id, alive: true).pluck(:thing)
-            if things.present?
-              message = create_message(things)
-            else
-              message = {
-                type: 'text',
-                text: '買うものはないよ〜'
-              }
-            end
+            message = if things.present?
+                        create_message(things)
+                      else
+                        {
+                          type: 'text',
+                          text: '買うものはないよ〜'
+                        }
+                      end
           when /クリア/
             ShoppingMemo.where(line_id: line_id, alive: true).update_all(alive: false)
             message = {
@@ -42,7 +42,29 @@ class ShoppingMemosController < ApplicationController
             ShoppingMemo.create(thing: input, line_id: line_id)
             message = {
               type: 'text',
-              text: 'OK!'
+              text: 'OK!',
+              "quickReply": {
+                "items": [
+                  {
+                    "type": 'action',
+                    # "imageUrl": "https://example.com/tempura.png",
+                    "action": {
+                      "type": 'message',
+                      "label": 'リスト（一覧表示）',
+                      "text": 'リスト'
+                    }
+                  },
+                  {
+                    "type": 'action',
+                    # "imageUrl": "https://example.com/tempura.png",
+                    "action": {
+                      "type": 'message',
+                      "label": 'クリア（すべて消去）',
+                      "text": 'クリア'
+                    }
+                  }
+                ]
+              }
             }
           end
           client.reply_message(event['replyToken'], message)
@@ -77,106 +99,129 @@ class ShoppingMemosController < ApplicationController
   def create_message(things)
     # デバックログ出力するために記述
     Amazon::Ecs.debug = true
-    t = things
+    # t = things
     {
       "type": 'flex',
       "altText": 'This is a Flex Message',
       "contents":
       {
         "type": 'carousel',
-        "contents": [
-          things.each_with_index do |thing, i|
-            create_content(thing)
-            # ',' if t[i+1].present?
-          end
-        ]
+        "contents":
+        create_contents(things)
       }
     }
   end
 
+  def create_contents(things)
+    contents = ''
+    case things.size
+    when 1
+      contents = [create_content(things[0])]
+    when 2
+      contents = create_content(things[0]), create_content(things[1])
+    when 3
+      contents = create_content(things[0]), create_content(things[1]), create_content(things[2])
+    when 4
+      contents = create_content(things[0]), create_content(things[1]), create_content(things[2]), create_content(things[3])
+    when 5
+      contents = create_content(things[0]), create_content(things[1]), create_content(things[2]), create_content(things[3]), create_content(things[4])
+    when 6
+      contents = create_content(things[0]), create_content(things[1]), create_content(things[2]), create_content(things[3]), create_content(things[4]), create_content(things[5])
+    when 7
+      contents = create_content(things[0]), create_content(things[1]), create_content(things[2]), create_content(things[3]), create_content(things[4]), create_content(things[5]), create_content(things[6])
+    when 8
+      contents = create_content(things[0]), create_content(things[1]), create_content(things[2]), create_content(things[3]), create_content(things[4]), create_content(things[5]), create_content(things[6]), create_content(things[7])
+    when 9
+      contents = create_content(things[0]), create_content(things[1]), create_content(things[2]), create_content(things[3]), create_content(things[4]), create_content(things[5]), create_content(things[6]), create_content(things[7]), create_content(things[8])
+    else
+      contents = create_content(things[0]), create_content(things[1]), create_content(things[2]), create_content(things[3]), create_content(things[4]), create_content(things[5]), create_content(things[6]), create_content(things[7]), create_content(things[8]), create_content(things[9])
+    end
+    contents
+  end
+
   def create_content(thing)
-      res1 = Amazon::Ecs.item_search(
-        thing, # キーワード指定
-        search_index: 'All', # 抜きたいジャンルを指定
-        response_group: 'BrowseNodes',
-        country: 'jp'
-      )
-      browse_node_no = res1.items.first.get('BrowseNodes/BrowseNode/BrowseNodeId')
-      res2 = Amazon::Ecs.item_search(
-        thing,
-        browse_node: browse_node_no,
-        response_group: 'ItemAttributes, Images, Offers',
-        country: 'jp',
-        sort: 'salesrank' # ソート順を売上順に指定することでランキングとする
-      )
-      item = res2.items.first
-      title = item.get('ItemAttributes/Title')
-      price = choice_price(item.get('ItemAttributes/ListPrice/FormattedPrice'), item.get('OfferSummary/LowestNewPrice/FormattedPrice'))
-      url = bitly_shorten(item.get('DetailPageURL'))
-      image = item.get('LargeImage/URL')
+    res1 = Amazon::Ecs.item_search(
+      thing, # キーワード指定
+      search_index: 'All', # 抜きたいジャンルを指定
+      response_group: 'BrowseNodes',
+      country: 'jp'
+    )
+    browse_node_no = res1.items.first.get('BrowseNodes/BrowseNode/BrowseNodeId')
+    res2 = Amazon::Ecs.item_search(
+      thing,
+      browse_node: browse_node_no,
+      response_group: 'ItemAttributes, Images, Offers',
+      country: 'jp',
+      sort: 'salesrank' # ソート順を売上順に指定することでランキングとする
+    )
+    item = res2.items.first
+    title = item.get('ItemAttributes/Title')
+    price = choice_price(item.get('ItemAttributes/ListPrice/FormattedPrice'), item.get('OfferSummary/LowestNewPrice/FormattedPrice'))
+    url = bitly_shorten(item.get('DetailPageURL'))
+    image = item.get('LargeImage/URL')
+    {
+      "type": 'bubble',
+      "hero": {
+        "type": 'image',
+        "size": 'full',
+        "aspectRatio": '20:13',
+        "aspectMode": 'cover',
+        "url": image
+      },
+      "body":
       {
-        "type": 'bubble',
-        "hero": {
-          "type": 'image',
-          "size": 'full',
-          "aspectRatio": '20:13',
-          "aspectMode": 'cover',
-          "url": image
-        },
-        "body":
-        {
-          "type": 'box',
-          "layout": 'vertical',
-          "spacing": 'sm',
-          "contents": [
-            {
-              "type": 'text',
-              "text": '1位',
-              "wrap": true,
-              # "size": "xs",
-              "margin": 'md',
-              "color": '#ff5551',
-              "flex": 0
-            },
-            {
-              "type": 'text',
-              "text": title,
-              "wrap": true,
-              "weight": 'bold',
-              "size": 'lg'
-            },
-            {
-              "type": 'box',
-              "layout": 'baseline',
-              "contents": [
-                {
-                  "type": 'text',
-                  "text": price,
-                  "wrap": true,
-                  "weight": 'bold',
-                  # "size": "lg",
-                  "flex": 0
-                }
-              ]
-            }
-          ]
-        },
-        "footer": {
-          "type": 'box',
-          "layout": 'vertical',
-          "spacing": 'sm',
-          "contents": [
-            {
-              "type": 'button',
-              "style": 'primary',
-              "action": {
-                "type": 'uri',
-                "label": 'Amazon商品ページへ',
-                "uri": url
+        "type": 'box',
+        "layout": 'vertical',
+        "spacing": 'sm',
+        "contents": [
+          {
+            "type": 'text',
+            "text": "「#{thing}」Amazon1位",
+            "wrap": true,
+            # "size": "xs",
+            "margin": 'md',
+            "color": '#ff5551',
+            "flex": 0
+          },
+          {
+            "type": 'text',
+            "text": title,
+            "wrap": true,
+            "weight": 'bold',
+            "size": 'lg'
+          },
+          {
+            "type": 'box',
+            "layout": 'baseline',
+            "contents": [
+              {
+                "type": 'text',
+                "text": price,
+                "wrap": true,
+                "weight": 'bold',
+                # "size": "lg",
+                "flex": 0
               }
+            ]
+          }
+        ]
+      },
+      "footer": {
+        "type": 'box',
+        "layout": 'vertical',
+        "spacing": 'sm',
+        "contents": [
+          {
+            "type": 'button',
+            "style": 'primary',
+            "action": {
+              "type": 'uri',
+              "label": 'Amazon商品ページへ',
+              "uri": url
             }
-          ]
-        }
+          }
+        ]
       }
+    }
   end
 end
