@@ -36,13 +36,13 @@ class ShoppingMemosController < ApplicationController
             ShoppingMemo.where(line_id: line_id, alive: true).update_all(alive: false)
             message = {
               type: 'text',
-              text: 'クリアしたよ!'
+              text: "クリアしたよー！\nお買い物お疲れさま！"
             }
           else
             ShoppingMemo.create(thing: input, line_id: line_id)
             message = {
               type: 'text',
-              text: 'OK!',
+              text: ['OK!', 'Yeah!', 'おけ', 'りょ', 'Yes!', 'Good!', 'Nice!', 'Great!', 'Perfect!'].sample,
               "quickReply": {
                 "items": [
                   {
@@ -99,17 +99,30 @@ class ShoppingMemosController < ApplicationController
   def create_message(things)
     # デバックログ出力するために記述
     Amazon::Ecs.debug = true
-    # t = things
-    {
-      "type": 'flex',
-      "altText": 'This is a Flex Message',
-      "contents":
+    [
       {
-        "type": 'carousel',
+        "type": 'flex',
+        "altText": 'This is a Flex Message',
         "contents":
-        create_contents(things)
+        {
+          "type": 'carousel',
+          "contents":
+          create_contents(things)
+        }
+      },
+      {
+        type: 'text',
+        text: list(things)
       }
-    }
+    ]
+  end
+
+  def list(things)
+    contents = "＜お買い物リスト＞\n1：#{things.shift}"
+    things.each_with_index do |thing, i|
+      contents += "\n#{i + 2}：#{thing}"
+    end
+    contents
   end
 
   def create_contents(things)
@@ -176,7 +189,7 @@ class ShoppingMemosController < ApplicationController
         "contents": [
           {
             "type": 'text',
-            "text": "「#{thing}」Amazon1位",
+            "text": "「#{thing}」Amazon 1位",
             "wrap": true,
             # "size": "xs",
             "margin": 'md',
