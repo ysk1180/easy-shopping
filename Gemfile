@@ -45,3 +45,5 @@ gem 'line-bot-api'
 gem 'amazon-ecs'
 
 gem 'bitly'
+
+gem 'rakuten_web_service'
