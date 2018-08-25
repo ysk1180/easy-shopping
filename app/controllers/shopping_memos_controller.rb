@@ -27,13 +27,15 @@ class ShoppingMemosController < ApplicationController
             if user.amazon
               message = {
                 type: 'text',
-                text: "検索対象はAmazonになっているよ！\n楽天に切り替えたいときは「楽天」と送信してね"
+                text: "検索対象はAmazonになっているよ！\n楽天に切り替えたいときは「楽天」と送信してね",
+                "quickReply": quick_content
               }
             else
               user.update!(amazon: true)
               message = {
                 type: 'text',
-                text: "検索対象をAmazonに切り替えたよ！\n楽天に戻したいときは「楽天」と送信してね"
+                text: "検索対象をAmazonに切り替えたよ！\n楽天に戻したいときは「楽天」と送信してね",
+                "quickReply": quick_content
               }
             end
           when /.*楽天|rakuten|Rakuten.*/
@@ -42,12 +44,14 @@ class ShoppingMemosController < ApplicationController
               user.update!(amazon: false)
               message = {
                 type: 'text',
-                text: "検索対象を楽天に切り替えたよ！\nAmazonに戻したいときは「Amazon」と送信してね"
+                text: "検索対象を楽天に切り替えたよ！\nAmazonに戻したいときは「Amazon」と送信してね",
+                "quickReply": quick_content
               }
             else
               message = {
                 type: 'text',
-                text: "検索対象は楽天になっているよ！\nAmazonに切り替えたいときは「Amazon」と送信してね"
+                text: "検索対象は楽天になっているよ！\nAmazonに切り替えたいときは「Amazon」と送信してね",
+                "quickReply": quick_content
               }
             end
           when /リスト/
@@ -72,28 +76,7 @@ class ShoppingMemosController < ApplicationController
             message = {
               type: 'text',
               text: ['OK!', 'Yeah!', 'おけ', 'りょ', 'Yes!', 'Good!', 'Nice!', 'Great!', 'Perfect!'].sample,
-              "quickReply": {
-                "items": [
-                  {
-                    "type": 'action',
-                    # "imageUrl": "https://example.com/tempura.png",
-                    "action": {
-                      "type": 'message',
-                      "label": 'リスト（一覧表示）',
-                      "text": 'リスト'
-                    }
-                  },
-                  {
-                    "type": 'action',
-                    # "imageUrl": "https://example.com/tempura.png",
-                    "action": {
-                      "type": 'message',
-                      "label": 'クリア（すべて消去）',
-                      "text": 'クリア'
-                    }
-                  }
-                ]
-              }
+              "quickReply": quick_content
             }
           end
           client.reply_message(event['replyToken'], message)
@@ -110,6 +93,29 @@ class ShoppingMemosController < ApplicationController
       config.channel_secret = ENV['LINE_CHANNEL_SECRET_MEMO']
       config.channel_token = ENV['LINE_CHANNEL_TOKEN_MEMO']
     end
+  end
+
+  def quick_content
+    {
+      "items": [
+        {
+          "type": 'action',
+          "action": {
+            "type": 'message',
+            "label": 'リスト（一覧表示）',
+            "text": 'リスト'
+          }
+        },
+        {
+          "type": 'action',
+          "action": {
+            "type": 'message',
+            "label": 'クリア（すべて消去）',
+            "text": 'クリア'
+          }
+        }
+      ]
+    }
   end
 
   def bitly_shorten(url)
