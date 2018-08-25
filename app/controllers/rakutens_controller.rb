@@ -52,7 +52,6 @@ class RakutensController < ApplicationController
     RakutenWebService.configuration do |c|
       c.application_id = ENV['RAKUTEN_APPID']
       c.affiliate_id = ENV['RAKUTEN_AFID']
-      # c.debug = true
     end
     item0 = RakutenWebService::Ichiba::Item.search(keyword: input, hits: 1, imageFlag: 1).first
 

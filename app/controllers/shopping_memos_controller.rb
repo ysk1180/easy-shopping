@@ -22,10 +22,39 @@ class ShoppingMemosController < ApplicationController
           input = event.message['text']
           line_id = event['source']['userId']
           case input
+          when /.*amazon|Amazon|アマゾン.*/
+            amazon = User.find_or_create_by(line_id: line_id).amazon
+            if amazon
+              message = {
+                type: 'text',
+                text: "検索対象はAmazonになっているよ！\n楽天に切り替えたいときは「楽天」と送信してね"
+              }
+            else
+              user.update!(amazon: true)
+              message = {
+                type: 'text',
+                text: "検索対象をAmazonに切り替えたよ！\n楽天に戻したいときは「楽天」と送信してね"
+              }
+            end
+          when /.*楽天|rakuten|Rakuten.*/
+            amazon = User.find_or_create_by(line_id: line_id).amazon
+            if amazon
+              user.update!(amazon: false)
+              message = {
+                type: 'text',
+                text: "検索対象を楽天に切り替えたよ！\nAmazonに戻したいときは「Amazon」と送信してね"
+              }
+            else
+              message = {
+                type: 'text',
+                text: "検索対象は楽天になっているよ！\nAmazonに切り替えたいときは「Amazon」と送信してね"
+              }
+            end
           when /リスト/
             things = ShoppingMemo.where(line_id: line_id, alive: true).pluck(:thing)
             message = if things.present?
-                        create_message(things)
+                        amazon = User.find_or_create_by(line_id: line_id).amazon
+                        create_message(things, amazon)
                       else
                         {
                           type: 'text',
@@ -96,9 +125,9 @@ class ShoppingMemosController < ApplicationController
     amazon_price.present? ? amazon_price : other_price
   end
 
-  def create_message(things)
+  def create_message(things, amazon)
     # デバックログ出力するために記述
-    Amazon::Ecs.debug = true
+    Amazon::Ecs.debug = true if amazon
     [
       {
         "type": 'flex',
@@ -107,7 +136,7 @@ class ShoppingMemosController < ApplicationController
         {
           "type": 'carousel',
           "contents":
-          create_contents(things)
+          create_contents(things, amazon)
         }
       },
       {
@@ -125,53 +154,71 @@ class ShoppingMemosController < ApplicationController
     contents
   end
 
-  def create_contents(things)
+  def create_contents(things, amazon)
     contents = ''
     case things.size
     when 1
-      contents = [create_content(things[0])]
+      contents = [create_content(things[0], amazon)]
     when 2
-      contents = create_content(things[0]), create_content(things[1])
+      contents = create_content(things[0], amazon), create_content(things[1], amazon)
     when 3
-      contents = create_content(things[0]), create_content(things[1]), create_content(things[2])
+      contents = create_content(things[0], amazon), create_content(things[1], amazon), create_content(things[2], amazon)
     when 4
-      contents = create_content(things[0]), create_content(things[1]), create_content(things[2]), create_content(things[3])
+      contents = create_content(things[0], amazon), create_content(things[1], amazon), create_content(things[2], amazon), create_content(things[3], amazon)
     when 5
-      contents = create_content(things[0]), create_content(things[1]), create_content(things[2]), create_content(things[3]), create_content(things[4])
+      contents = create_content(things[0], amazon), create_content(things[1], amazon), create_content(things[2], amazon), create_content(things[3], amazon), create_content(things[4], amazon)
     when 6
-      contents = create_content(things[0]), create_content(things[1]), create_content(things[2]), create_content(things[3]), create_content(things[4]), create_content(things[5])
+      contents = create_content(things[0], amazon), create_content(things[1], amazon), create_content(things[2], amazon), create_content(things[3], amazon), create_content(things[4], amazon), create_content(things[5], amazon)
     when 7
-      contents = create_content(things[0]), create_content(things[1]), create_content(things[2]), create_content(things[3]), create_content(things[4]), create_content(things[5]), create_content(things[6])
+      contents = create_content(things[0], amazon), create_content(things[1], amazon), create_content(things[2], amazon), create_content(things[3], amazon), create_content(things[4], amazon), create_content(things[5], amazon), create_content(things[6], amazon)
     when 8
-      contents = create_content(things[0]), create_content(things[1]), create_content(things[2]), create_content(things[3]), create_content(things[4]), create_content(things[5]), create_content(things[6]), create_content(things[7])
+      contents = create_content(things[0], amazon), create_content(things[1], amazon), create_content(things[2], amazon), create_content(things[3], amazon), create_content(things[4], amazon), create_content(things[5], amazon), create_content(things[6], amazon), create_content(things[7], amazon)
     when 9
-      contents = create_content(things[0]), create_content(things[1]), create_content(things[2]), create_content(things[3]), create_content(things[4]), create_content(things[5]), create_content(things[6]), create_content(things[7]), create_content(things[8])
+      contents = create_content(things[0], amazon), create_content(things[1], amazon), create_content(things[2], amazon), create_content(things[3], amazon), create_content(things[4], amazon), create_content(things[5], amazon), create_content(things[6], amazon), create_content(things[7], amazon), create_content(things[8], amazon)
     else
-      contents = create_content(things[0]), create_content(things[1]), create_content(things[2]), create_content(things[3]), create_content(things[4]), create_content(things[5]), create_content(things[6]), create_content(things[7]), create_content(things[8]), create_content(things[9])
+      contents = create_content(things[0], amazon), create_content(things[1], amazon), create_content(things[2], amazon), create_content(things[3], amazon), create_content(things[4], amazon), create_content(things[5], amazon), create_content(things[6], amazon), create_content(things[7], amazon), create_content(things[8], amazon), create_content(things[9], amazon)
     end
     contents
   end
 
-  def create_content(thing)
-    res1 = Amazon::Ecs.item_search(
-      thing, # キーワード指定
-      search_index: 'All', # 抜きたいジャンルを指定
-      response_group: 'BrowseNodes',
-      country: 'jp'
-    )
-    browse_node_no = res1.items.first.get('BrowseNodes/BrowseNode/BrowseNodeId')
-    res2 = Amazon::Ecs.item_search(
-      thing,
-      browse_node: browse_node_no,
-      response_group: 'ItemAttributes, Images, Offers',
-      country: 'jp',
-      sort: 'salesrank' # ソート順を売上順に指定することでランキングとする
-    )
-    item = res2.items.first
-    title = item.get('ItemAttributes/Title')
-    price = choice_price(item.get('ItemAttributes/ListPrice/FormattedPrice'), item.get('OfferSummary/LowestNewPrice/FormattedPrice'))
-    url = bitly_shorten(item.get('DetailPageURL'))
-    image = item.get('LargeImage/URL')
+  def create_content(thing, amazon)
+    if amazon
+      res1 = Amazon::Ecs.item_search(
+        thing, # キーワード指定
+        search_index: 'All', # 抜きたいジャンルを指定
+        response_group: 'BrowseNodes',
+        country: 'jp'
+      )
+      browse_node_no = res1.items.first.get('BrowseNodes/BrowseNode/BrowseNodeId')
+      res2 = Amazon::Ecs.item_search(
+        thing,
+        browse_node: browse_node_no,
+        response_group: 'ItemAttributes, Images, Offers',
+        country: 'jp',
+        sort: 'salesrank' # ソート順を売上順に指定することでランキングとする
+      )
+      item = res2.items.first
+      title = item.get('ItemAttributes/Title')
+      price = choice_price(item.get('ItemAttributes/ListPrice/FormattedPrice'), item.get('OfferSummary/LowestNewPrice/FormattedPrice'))
+      url = bitly_shorten(item.get('DetailPageURL'))
+      image = item.get('LargeImage/URL')
+      amazon_or_rakuten = 'Amazon'
+    else
+      RakutenWebService.configuration do |c|
+        c.application_id = ENV['RAKUTEN_APPID']
+        c.affiliate_id = ENV['RAKUTEN_AFID']
+      end
+      item0 = RakutenWebService::Ichiba::Item.search(keyword: input, hits: 1, imageFlag: 1).first
+
+      genre_id = item0['genreId']
+      item = RakutenWebService::Ichiba::Item.ranking(genreId: genre_id).first
+
+      title = item['itemName']
+      price = item['itemPrice'].to_s
+      url = item['itemUrl']
+      image = item['mediumImageUrls'].first
+      amazon_or_rakuten = '楽天'
+    end
     {
       "type": 'bubble',
       "hero": {
@@ -189,7 +236,7 @@ class ShoppingMemosController < ApplicationController
         "contents": [
           {
             "type": 'text',
-            "text": "「#{thing}」Amazon 1位",
+            "text": "「#{thing}」#{amazon_or_rakuten} 1位",
             "wrap": true,
             # "size": "xs",
             "margin": 'md',
@@ -229,7 +276,7 @@ class ShoppingMemosController < ApplicationController
             "style": 'primary',
             "action": {
               "type": 'uri',
-              "label": 'Amazon商品ページへ',
+              "label": "#{amazon_or_rakuten}商品ページへ",
               "uri": url
             }
           }
