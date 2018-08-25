@@ -23,8 +23,8 @@ class ShoppingMemosController < ApplicationController
           line_id = event['source']['userId']
           case input
           when /.*amazon|Amazon|アマゾン.*/
-            amazon = User.find_or_create_by(line_id: line_id).amazon
-            if amazon
+            user = User.find_or_create_by(line_id: line_id)
+            if user.amazon
               message = {
                 type: 'text',
                 text: "検索対象はAmazonになっているよ！\n楽天に切り替えたいときは「楽天」と送信してね"
@@ -37,8 +37,8 @@ class ShoppingMemosController < ApplicationController
               }
             end
           when /.*楽天|rakuten|Rakuten.*/
-            amazon = User.find_or_create_by(line_id: line_id).amazon
-            if amazon
+            user = User.find_or_create_by(line_id: line_id)
+            if user.amazon
               user.update!(amazon: false)
               message = {
                 type: 'text',
