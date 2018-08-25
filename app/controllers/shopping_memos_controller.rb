@@ -220,7 +220,7 @@ class ShoppingMemosController < ApplicationController
       item = RakutenWebService::Ichiba::Item.ranking(genreId: genre_id).first
 
       title = item['itemName']
-      price = item['itemPrice'].to_s
+      price = item['itemPrice'].to_s + '円'
       url = item['itemUrl']
       image = item['mediumImageUrls'].first
       amazon_or_rakuten = '楽天'
