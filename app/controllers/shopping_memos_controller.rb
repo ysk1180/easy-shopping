@@ -208,7 +208,7 @@ class ShoppingMemosController < ApplicationController
         c.application_id = ENV['RAKUTEN_APPID']
         c.affiliate_id = ENV['RAKUTEN_AFID']
       end
-      item0 = RakutenWebService::Ichiba::Item.search(keyword: input, hits: 1, imageFlag: 1).first
+      item0 = RakutenWebService::Ichiba::Item.search(keyword: thing, hits: 1, imageFlag: 1).first
 
       genre_id = item0['genreId']
       item = RakutenWebService::Ichiba::Item.ranking(genreId: genre_id).first
