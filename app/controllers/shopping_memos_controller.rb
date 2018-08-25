@@ -214,10 +214,11 @@ class ShoppingMemosController < ApplicationController
         c.application_id = ENV['RAKUTEN_APPID']
         c.affiliate_id = ENV['RAKUTEN_AFID']
       end
-      item0 = RakutenWebService::Ichiba::Item.search(keyword: thing, hits: 1, imageFlag: 1).first
+      item = RakutenWebService::Ichiba::Item.search(keyword: thing, hits: 1, imageFlag: 1).first
 
-      genre_id = item0['genreId']
-      item = RakutenWebService::Ichiba::Item.ranking(genreId: genre_id).first
+    # 　ランキングでキーワード検索ができず、キーワードと関係ない商品が出てしまうことがあったので、一旦コメントアウト
+    #   genre_id = item['genreId']
+    #   item = RakutenWebService::Ichiba::Item.ranking(genreId: genre_id).first
 
       title = item['itemName']
       price = item['itemPrice'].to_s + '円'
