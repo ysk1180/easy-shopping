@@ -285,6 +285,117 @@ class LinebotsController < ApplicationController
     end
   end
 
+  def seach_and_create_messages(input)
+    # デバックログを出力するために記述(動作には影響なし)
+    Amazon::Ecs.debug = true
+    # AmazonAPIの仕様上、ALLジャンルからのランキングの取得はできないので、
+    # ALLジャンルで商品検索→最初に出力された商品のジャンルを取得し、
+    # そのジャンル内でのランキングを再度取得する。
+    # つまり、2度APIを利用する。
+    res1 = Amazon::Ecs.item_search(
+      input, # キーワード指定
+      search_index: 'All', # 抜きたいジャンルを指定
+      response_group: 'BrowseNodes', # 取得したいジャンルIDはBrowseNodesグループに含まれているのでここで指定する
+      country: 'jp'
+    )
+    # ジャンルIDを取得する
+    # Amazonの公式ドキュメント（https://images-na.ssl-images-amazon.com/images/G/09/associates/paapi/dg/index.html）に
+    # 各要素、取得するために使用する親要素の一覧が掲載されています
+    browse_node_no = res1.items.first.get('BrowseNodes/BrowseNode/BrowseNodeId')
+    res2 = Amazon::Ecs.item_search(
+      input,
+      browse_node: browse_node_no, # 取得したジャンルID内でのランキングを取得する
+      response_group: 'ItemAttributes, Images, Offers',
+      country: 'jp',
+      sort: 'salesrank' # ソート順を売上順に指定することでランキングとする
+    )
+    make_reply_content(res2)
+  end
+
+  def make_reply_content(res2)
+    {
+      "type": "flex",
+      "altText": "This is a Flex Message",
+      "contents":
+      {
+        "type": "carousel",
+        "contents": [
+          make_part(res2.items[0], 1),
+          make_part(res2.items[1], 2),
+          make_part(res2.items[2], 3)
+        ]
+      }
+    }
+  end
+
+  def make_content(item, rank)
+    title << item.get('ItemAttributes/Title')
+    price << choice_price(item.get('ItemAttributes/ListPrice/FormattedPrice'), item.get('OfferSummary/LowestNewPrice/FormattedPrice'))
+    url << bitly_shorten(item.get('DetailPageURL'))
+    image << item.get('LargeImage/URL')
+    {
+      "type": "bubble",
+      "hero": {
+        "type": "image",
+        "size": "full",
+        "aspectRatio": "20:13",
+        "aspectMode": "cover",
+        "url": image
+      },
+      "body":
+      {
+        "type": "box",
+        "layout": "vertical",
+        "spacing": "sm",
+        "contents": [
+          {
+            "type": "text",
+            "text": "#{rank}位",
+            "wrap": true,
+            "margin": "md",
+            "color": "#ff5551",
+            "flex": 0
+          },
+          {
+            "type": "text",
+            "text": title,
+            "wrap": true,
+            "weight": "bold",
+            "size": "lg"
+          },
+          {
+            "type": "box",
+            "layout": "baseline",
+            "contents": [
+              {
+                "type": "text",
+                "text": price,
+                "wrap": true,
+                "weight": "bold",
+                "flex": 0
+              }
+            ]
+          }                      ]
+      },
+      "footer": {
+        "type": "box",
+        "layout": "vertical",
+        "spacing": "sm",
+        "contents": [
+          {
+            "type": "button",
+            "style": "primary",
+            "action": {
+              "type": "uri",
+              "label": "Amazon商品ページへ",
+              "uri": url
+            }
+          }
+        ]
+      }
+    }
+  end
+
   def bitly_shorten(url)
     Bitly.use_api_version_3
     Bitly.configure do |config|
