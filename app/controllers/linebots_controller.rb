@@ -37,7 +37,7 @@ class LinebotsController < ApplicationController
     end
   end
 
-  def seach_and_create_messages(input)
+  def search_and_create_messages(input)
     # デバックログを出力するために記述(動作には影響なし)
     Amazon::Ecs.debug = true
     # AmazonAPIの仕様上、ALLジャンルからのランキングの取得はできないので、
