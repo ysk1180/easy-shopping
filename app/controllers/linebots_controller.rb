@@ -81,7 +81,7 @@ class LinebotsController < ApplicationController
     }
   end
 
-  def make_content(item, rank)
+  def make_part(item, rank)
     title << item.get('ItemAttributes/Title')
     # 価格は2箇所から取得しており、1番目の方にデータがない場合2番目のデータを使う
     price << item.get('ItemAttributes/ListPrice/FormattedPrice') || item.get('OfferSummary/LowestNewPrice/FormattedPrice')
