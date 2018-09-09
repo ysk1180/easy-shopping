@@ -17,258 +17,10 @@ class LinebotsController < ApplicationController
       when Line::Bot::Event::Message
         case event.type
         when Line::Bot::Event::MessageType::Text
+          # 入力した文字をinputに格納
           input = event.message['text']
-          # デバックログ出力するために記述
-          Amazon::Ecs.debug = true
-          res1 = Amazon::Ecs.item_search(
-            input, # キーワード指定
-            search_index: 'All', # 抜きたいジャンルを指定
-            response_group: 'BrowseNodes',
-            country: 'jp'
-          )
-          browse_node_no = res1.items.first.get('BrowseNodes/BrowseNode/BrowseNodeId')
-          res2 = Amazon::Ecs.item_search(
-            input,
-            browse_node: browse_node_no,
-            response_group: 'ItemAttributes, Images, Offers',
-            country: 'jp',
-            sort: 'salesrank' # ソート順を売上順に指定することでランキングとする
-          )
-          titles = []
-          images = []
-          prices = []
-          urls = []
-          res2.items.each.with_index(1) do |item, i|
-            # titles << "＜#{i}位＞\n#{item.get('ItemAttributes/Title')}\n#{choice_price(item.get('ItemAttributes/ListPrice/FormattedPrice'), item.get('OfferSummary/LowestNewPrice/FormattedPrice'))}\n#{bitly_shorten(item.get('DetailPageURL'))}"
-
-            titles << item.get('ItemAttributes/Title')
-            prices << choice_price(item.get('ItemAttributes/ListPrice/FormattedPrice'), item.get('OfferSummary/LowestNewPrice/FormattedPrice'))
-            urls << bitly_shorten(item.get('DetailPageURL'))
-            images << item.get('LargeImage/URL')
-
-            break if i == 3
-          end
-          messages = 
-            # [
-            {
-              "type": "flex",
-              "altText": "This is a Flex Message",
-              "contents": 
-              {
-                "type": "carousel",
-                "contents": [
-                  {
-                    "type": "bubble",
-                    "hero": {
-                      "type": "image",
-                      "size": "full",
-                      "aspectRatio": "20:13",
-                      "aspectMode": "cover",
-                      "url": images[0]
-                    },
-                    "body":
-                    {
-                      "type": "box",
-                      "layout": "vertical",
-                      "spacing": "sm",
-                      "contents": [
-                        {
-                          "type": "text",
-                          "text": "1位",
-                          "wrap": true,
-                          # "size": "xs",
-                          "margin": "md",
-                          "color": "#ff5551",
-                          "flex": 0
-                        },
-                        {
-                          "type": "text",
-                          "text": titles[0],
-                          "wrap": true,
-                          "weight": "bold",
-                          "size": "lg"
-                        },
-                        {
-                          "type": "box",
-                          "layout": "baseline",
-                          "contents": [
-                            {
-                              "type": "text",
-                              "text": prices[0],
-                              "wrap": true,
-                              "weight": "bold",
-                              # "size": "lg",
-                              "flex": 0
-                            }
-                          ]
-                        }                      ]
-                    },
-                    "footer": {
-                      "type": "box",
-                      "layout": "vertical",
-                      "spacing": "sm",
-                      "contents": [
-                        {
-                          "type": "button",
-                          "style": "primary",
-                          "action": {
-                            "type": "uri",
-                            "label": "Amazon商品ページへ",
-                            "uri": urls[0]
-                          }
-                        }
-                      ]
-                    }
-                  },
-                  {
-                    "type": "bubble",
-                    "hero": {
-                      "type": "image",
-                      "size": "full",
-                      "aspectRatio": "20:13",
-                      "aspectMode": "cover",
-                      "url": images[1]
-                    },
-                    "body":
-                    {
-                      "type": "box",
-                      "layout": "vertical",
-                      "spacing": "sm",
-                      "contents": [
-                        {
-                          "type": "text",
-                          "text": "2位",
-                          "wrap": true,
-                          # "size": "xs",
-                          "margin": "md",
-                          "color": "#ff5551",
-                          "flex": 0
-                        },{
-                          "type": "text",
-                          "text": titles[1],
-                          "wrap": true,
-                          "weight": "bold",
-                          "size": "lg"
-                        },
-                        {
-                          "type": "box",
-                          "layout": "baseline",
-                          "contents": [
-                            {
-                              "type": "text",
-                              "text": prices[1],
-                              "wrap": true,
-                              "weight": "bold",
-                              # "size": "lg",
-                              "flex": 0
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    "footer": {
-                      "type": "box",
-                      "layout": "vertical",
-                      "spacing": "sm",
-                      "contents": [
-                        {
-                          "type": "button",
-                          "style": "primary",
-                          "action": {
-                            "type": "uri",
-                            "label": "Amazon商品ページへ",
-                            "uri": urls[1]
-                          }
-                        }
-                      ]
-                    }
-                  },
-                  {
-                    "type": "bubble",
-                    "hero": {
-                      "type": "image",
-                      "size": "full",
-                      "aspectRatio": "20:13",
-                      "aspectMode": "cover",
-                      "url": images[2]
-                    },
-                    "body":
-                    {
-                      "type": "box",
-                      "layout": "vertical",
-                      "spacing": "sm",
-                      "contents": [
-                        {
-                          "type": "text",
-                          "text": "3位",
-                          "wrap": true,
-                          # "size": "xs",
-                          "margin": "md",
-                          "color": "#ff5551",
-                          "flex": 0
-                        },
-                        {
-                          "type": "text",
-                          "text": titles[2],
-                          "wrap": true,
-                          "weight": "bold",
-                          "size": "lg"
-                        },
-                        {
-                          "type": "box",
-                          "layout": "baseline",
-                          "contents": [
-                            {
-                              "type": "text",
-                              "text": prices[2],
-                              "wrap": true,
-                              "weight": "bold",
-                              # "size": "lg",
-                              "flex": 0
-                            }
-                          ]
-                        }                      ]
-                    },
-                    "footer": {
-                      "type": "box",
-                      "layout": "vertical",
-                      "spacing": "sm",
-                      "contents": [
-                        {
-                          "type": "button",
-                          "style": "primary",
-                          "action": {
-                            "type": "uri",
-                            "label": "Amazon商品ページへ",
-                            "uri": urls[2]
-                          }
-                        }
-                      ]
-                    }
-                  }
-                ]
-              }
-          }
-
-          #     {
-          #     type: 'text',
-          #     text: titles[0]
-          #   }, {
-          #     type: 'image',
-          #     originalContentUrl: images[0],
-          #     previewImageUrl: images[0]
-          #   }, {
-          #     type: 'text',
-          #     text: titles[1]
-          #   }, {
-          #     type: 'image',
-          #     originalContentUrl: images[1],
-          #     previewImageUrl: images[1]
-          #   }, {
-          #     type: 'text',
-          #     text: titles[2]
-          #   }
-          # ]
+          # search_and_create_messageメソッド内で、AmazonAPIを用いた商品検索、メッセージの作成を行う
+          messages = search_and_create_messages(input)
           client.reply_message(event['replyToken'], messages)
         end
       end
@@ -300,7 +52,7 @@ class LinebotsController < ApplicationController
     )
     # ジャンルIDを取得する
     # Amazonの公式ドキュメント（https://images-na.ssl-images-amazon.com/images/G/09/associates/paapi/dg/index.html）に
-    # 各要素、取得するために使用する親要素の一覧が掲載されています
+    # 各要素、取得するために使用する親要素の一覧が掲載されている
     browse_node_no = res1.items.first.get('BrowseNodes/BrowseNode/BrowseNodeId')
     res2 = Amazon::Ecs.item_search(
       input,
@@ -311,7 +63,8 @@ class LinebotsController < ApplicationController
     )
     make_reply_content(res2)
   end
-
+  # LINE公式のFlex Message Simulator(https://developers.line.me/console/fx/)でShoppingのテーマをベースに作成
+  # 細かい使用はLINE公式ドキュメント(https://developers.line.me/ja/docs/messaging-api/using-flex-messages/)ご参照
   def make_reply_content(res2)
     {
       "type": "flex",
@@ -330,7 +83,8 @@ class LinebotsController < ApplicationController
 
   def make_content(item, rank)
     title << item.get('ItemAttributes/Title')
-    price << choice_price(item.get('ItemAttributes/ListPrice/FormattedPrice'), item.get('OfferSummary/LowestNewPrice/FormattedPrice'))
+    # 価格は2箇所から取得しており、1番目の方にデータがない場合2番目のデータを使う
+    price << item.get('ItemAttributes/ListPrice/FormattedPrice') || item.get('OfferSummary/LowestNewPrice/FormattedPrice')
     url << bitly_shorten(item.get('DetailPageURL'))
     image << item.get('LargeImage/URL')
     {
@@ -403,9 +157,5 @@ class LinebotsController < ApplicationController
       config.access_token = ENV['BITLY_ACCESS_TOKEN']
     end
     Bitly.client.shorten(url).short_url
-  end
-
-  def choice_price(amazon_price, other_price)
-    amazon_price.present? ? amazon_price : other_price
   end
 end
