@@ -64,7 +64,7 @@ class LinebotsController < ApplicationController
     make_reply_content(res2)
   end
   # LINE公式のFlex Message Simulator(https://developers.line.me/console/fx/)でShoppingのテーマをベースに作成
-  # 細かい使用はLINE公式ドキュメント(https://developers.line.me/ja/docs/messaging-api/using-flex-messages/)ご参照
+  # 細かい仕様はLINE公式ドキュメント(https://developers.line.me/ja/docs/messaging-api/using-flex-messages/)ご参照
   def make_reply_content(res2)
     {
       "type": "flex",
@@ -83,7 +83,7 @@ class LinebotsController < ApplicationController
 
   def make_part(item, rank)
     title = item.get('ItemAttributes/Title')
-    # 価格は2箇所から取得しており、1番目の方にデータがない場合2番目のデータを使う
+    # 価格は2箇所から取得しており、1番目の方にデータがない場合は2番目のデータを使う
     price = item.get('ItemAttributes/ListPrice/FormattedPrice') || item.get('OfferSummary/LowestNewPrice/FormattedPrice')
     url = bitly_shorten(item.get('DetailPageURL'))
     image = item.get('LargeImage/URL')

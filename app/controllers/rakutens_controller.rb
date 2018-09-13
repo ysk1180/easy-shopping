@@ -16,8 +16,10 @@ class RakutensController < ApplicationController
       when Line::Bot::Event::Message
         case event.type
         when Line::Bot::Event::MessageType::Text
+          # 入力した文字をinputに格納
           input = event.message['text']
-          message = create_message(input)
+          # search_and_create_messageメソッド内で、楽天APIを用いた商品検索、メッセージの作成を行う
+          message = search_and_create_message(input)
           client.reply_message(event['replyToken'], message)
         end
       end
@@ -34,113 +36,93 @@ class RakutensController < ApplicationController
     end
   end
 
-  def create_message(input)
-    # デバックログ出力するために記述
+  def search_and_create_message(input)
+    RakutenWebService.configuration do |c|
+      c.application_id = ENV['RAKUTEN_APPID']
+      c.affiliate_id = ENV['RAKUTEN_AFID']
+    end
+    # 楽天の商品検索APIで画像がある商品の中で、入力値で検索して上から3件を取得する
+    # 商品検索+ランキングでの取得はできないため標準の並び順で上から3件取得する
+    res = RakutenWebService::Ichiba::Item.search(keyword: input, hits: 3, imageFlag: 1)
+    items = []
+    # 取得したデータを使いやすいように配列に格納し直す
+    items = res.map{|item| item}
+    make_reply_content(items)
+  end
+
+  def make_reply_content(items)
     {
       "type": 'flex',
       "altText": 'This is a Flex Message',
       "contents":
       {
         "type": 'carousel',
-        "contents":
-        create_content(input)
+        "contents": [
+          make_part(items[0]),
+          make_part(items[1]),
+          make_part(items[2])
+        ]
       }
     }
   end
 
-  def create_content(input)
-    RakutenWebService.configuration do |c|
-      c.application_id = ENV['RAKUTEN_APPID']
-      c.affiliate_id = ENV['RAKUTEN_AFID']
-    end
-    item0 = RakutenWebService::Ichiba::Item.search(keyword: input, hits: 1, imageFlag: 1).first
-
-    genre_id = item0['genreId']
-    item = RakutenWebService::Ichiba::Item.ranking(genreId: genre_id).first
-
+  def make_part(item)
     title = item['itemName']
     price = item['itemPrice'].to_s + '円'
     url = item['itemUrl']
     image = item['mediumImageUrls'].first
-
-    # browse_node_no = res1.items.first.get('BrowseNodes/BrowseNode/BrowseNodeId')
-    # res2 = Amazon::Ecs.item_search(
-    #   thing,
-    #   browse_node: browse_node_no,
-    #   response_group: 'ItemAttributes, Images, Offers',
-    #   country: 'jp',
-    #   sort: 'salesrank' # ソート順を売上順に指定することでランキングとする
-    # )
-    # item = res2.items.first
-    # title = item.get('ItemAttributes/Title')
-    # price = choice_price(item.get('ItemAttributes/ListPrice/FormattedPrice'), item.get('OfferSummary/LowestNewPrice/FormattedPrice'))
-    # url = bitly_shorten(item.get('DetailPageURL'))
-    # image = item.get('LargeImage/URL')
-    [
     {
-      "type": 'bubble',
+      "type": "bubble",
       "hero": {
-        "type": 'image',
-        "size": 'full',
-        "aspectRatio": '20:13',
-        "aspectMode": 'cover',
+        "type": "image",
+        "size": "full",
+        "aspectRatio": "20:13",
+        "aspectMode": "cover",
         "url": image
       },
       "body":
       {
-        "type": 'box',
-        "layout": 'vertical',
-        "spacing": 'sm',
+        "type": "box",
+        "layout": "vertical",
+        "spacing": "sm",
         "contents": [
           {
-            "type": 'text',
-            "text": "「#{input}」Amazon 1位",
-            "wrap": true,
-            # "size": "xs",
-            "margin": 'md',
-            "color": '#ff5551',
-            "flex": 0
-          },
-          {
-            "type": 'text',
+            "type": "text",
             "text": title,
             "wrap": true,
-            "weight": 'bold',
-            "size": 'lg'
+            "weight": "bold",
+            "size": "lg"
           },
           {
-            "type": 'box',
-            "layout": 'baseline',
+            "type": "box",
+            "layout": "baseline",
             "contents": [
               {
-                "type": 'text',
+                "type": "text",
                 "text": price,
                 "wrap": true,
-                "weight": 'bold',
-                # "size": "lg",
+                "weight": "bold",
                 "flex": 0
               }
             ]
-          }
-        ]
+          }                      ]
       },
       "footer": {
-        "type": 'box',
-        "layout": 'vertical',
-        "spacing": 'sm',
+        "type": "box",
+        "layout": "vertical",
+        "spacing": "sm",
         "contents": [
           {
-            "type": 'button',
-            "style": 'primary',
+            "type": "button",
+            "style": "primary",
             "action": {
-              "type": 'uri',
-              "label": 'Amazon商品ページへ',
+              "type": "uri",
+              "label": "Amazon商品ページへ",
               "uri": url
             }
           }
         ]
       }
     }
-    ]
   end
 end
