@@ -1,24 +1,32 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## サービス名
+| サービス名 |
+|:-|:-|
+| EAZY Shopping |
+| お買い物メモ君 |
 
-Things you may want to cover:
+## 概要
+| サービス名 | 概要 |
+|:-|:-|
+| EAZY Shopping | 欲しい商品を入力すると、Amazon・楽天の1位〜3位を返してくれるLINE bot |
+| お買い物メモ君 | EAZY Shopping にメモ機能を追加したサービス |
 
-* Ruby version
+## サービス紹介ブログ
+[Railsでお買い物メモ & Amazon・楽天のランキング１位を返してくれるLINE bot作りました](https://ysk-pro.hatenablog.com/entry/shopping-memo)
 
-* System dependencies
+## チュートリアル
+[【初学者向け】Ruby on RailsでのLINE botチュートリアル第３弾〜Amazon API・楽天APIを使ってお買い物Botを作ってみよう〜](https://note.mu/ysk1180/n/ndb7202e19cd9)
 
-* Configuration
+## バージョン
+| Name | Version |
+|:-|:-|
+| Ruby | 2.5.1 |
+| Rails | 5.2.0 |
+| PostgreSQL | 11.1 |
 
-* Database creation
+## リリース日
+2018年8月
 
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+## 作者
+@ysk1180
