@@ -37,18 +37,15 @@ class LinebotsController < ApplicationController
     end
   end
 
-  def request
-    @request ||= Vacuum.new(marketplace: 'JP',
-                            access_key: ENV['AMAZON_API_ACCESS_KEY'],
-                            secret_key: ENV['AMAZON_API_SECRET_KEY'],
-                            partner_tag: ENV['ASSOCIATE_TAG'])
-  end
-
   def search_and_create_messages(keyword)
     # AmazonAPIの仕様上、ALLジャンルからのランキングの取得はできないので、
     # ALLジャンルで商品検索→最初に出力された商品のジャンルを取得し、
     # そのジャンル内でのランキングを再度取得する。
     # つまり、2度APIを利用する
+    request = Vacuum.new(marketplace: 'JP',
+                         access_key: ENV['AMAZON_API_ACCESS_KEY'],
+                         secret_key: ENV['AMAZON_API_SECRET_KEY'],
+                         partner_tag: ENV['ASSOCIATE_TAG'])
 
     # ジャンルIDを取得する
     res1 = request.search_items(keywords: keyword,
@@ -65,6 +62,7 @@ class LinebotsController < ApplicationController
 
     make_reply_content(items)
   end
+
   # LINE公式のFlex Message Simulator(https://developers.line.me/console/fx/)でShoppingのテーマをベースに作成
   # 細かい仕様はLINE公式ドキュメント(https://developers.line.me/ja/docs/messaging-api/using-flex-messages/)ご参照
   def make_reply_content(items)
