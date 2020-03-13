@@ -44,7 +44,7 @@ class LinebotsController < ApplicationController
                             partner_tag: ENV['ASSOCIATE_TAG'])
   end
 
-  def search_and_create_messages(input)
+  def search_and_create_messages(keyword)
     # AmazonAPIの仕様上、ALLジャンルからのランキングの取得はできないので、
     # ALLジャンルで商品検索→最初に出力された商品のジャンルを取得し、
     # そのジャンル内でのランキングを再度取得する。
