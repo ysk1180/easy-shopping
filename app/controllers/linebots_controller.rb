@@ -37,35 +37,37 @@ class LinebotsController < ApplicationController
     end
   end
 
+  def request
+    @request ||= Vacuum.new(marketplace: 'JP',
+                            access_key: ENV['AMAZON_API_ACCESS_KEY'],
+                            secret_key: ENV['AMAZON_API_SECRET_KEY'],
+                            partner_tag: ENV['ASSOCIATE_TAG'])
+  end
+
   def search_and_create_messages(input)
-    # デバックログを出力するために記述(動作には影響なし)
-    Amazon::Ecs.debug = true
     # AmazonAPIの仕様上、ALLジャンルからのランキングの取得はできないので、
     # ALLジャンルで商品検索→最初に出力された商品のジャンルを取得し、
     # そのジャンル内でのランキングを再度取得する。
-    # つまり、2度APIを利用する。
-    res1 = Amazon::Ecs.item_search(
-      input, # キーワード指定
-      search_index: 'All', # 抜きたいジャンルを指定
-      response_group: 'BrowseNodes', # 取得したいジャンルIDはBrowseNodesグループに含まれているのでここで指定する
-      country: 'jp'
-    )
+    # つまり、2度APIを利用する
+
     # ジャンルIDを取得する
-    # Amazonの公式ドキュメント（https://images-na.ssl-images-amazon.com/images/G/09/associates/paapi/dg/index.html）に
-    # 各要素、取得するために使用する親要素の一覧が掲載されている
-    browse_node_no = res1.items.first.get('BrowseNodes/BrowseNode/BrowseNodeId')
-    res2 = Amazon::Ecs.item_search(
-      input,
-      browse_node: browse_node_no, # 取得したジャンルID内でのランキングを取得する
-      response_group: 'ItemAttributes, Images, Offers',
-      country: 'jp',
-      sort: 'salesrank' # ソート順を売上順に指定することでランキングとする
-    )
-    make_reply_content(res2)
+    res1 = request.search_items(keywords: keyword,
+                                resources: ['BrowseNodeInfo.BrowseNodes']).to_h
+    browse_node_no = res1.dig('SearchResult','Items').first.dig('BrowseNodeInfo','BrowseNodes').first.dig('Id')
+
+    # ジャンルÎD内でのランキングを取得する
+    # ジャンルIDを指定するとデフォルトで売上順になる（↓に記載）
+    # https://docs.aws.amazon.com/AWSECommerceService/latest/DG/APPNDX_SortValuesArticle.html
+    res2 = request.search_items(keywords: keyword,
+                                browse_node_id: browse_node_no, resources:
+                                ['ItemInfo.Title', 'Images.Primary.Large', 'Offers.Listings.Price']).to_h
+    items = res2.dig('SearchResult', 'Items')
+
+    make_reply_content(items)
   end
   # LINE公式のFlex Message Simulator(https://developers.line.me/console/fx/)でShoppingのテーマをベースに作成
   # 細かい仕様はLINE公式ドキュメント(https://developers.line.me/ja/docs/messaging-api/using-flex-messages/)ご参照
-  def make_reply_content(res2)
+  def make_reply_content(items)
     {
       "type": "flex",
       "altText": "This is a Flex Message",
@@ -73,20 +75,19 @@ class LinebotsController < ApplicationController
       {
         "type": "carousel",
         "contents": [
-          make_part(res2.items[0], 1),
-          make_part(res2.items[1], 2),
-          make_part(res2.items[2], 3)
+          make_part(items[0], 1),
+          make_part(items[1], 2),
+          make_part(items[2], 3)
         ]
       }
     }
   end
 
   def make_part(item, rank)
-    title = item.get('ItemAttributes/Title')
-    # 価格は2箇所から取得しており、1番目の方にデータがない場合は2番目のデータを使う
-    price = item.get('ItemAttributes/ListPrice/FormattedPrice') || item.get('OfferSummary/LowestNewPrice/FormattedPrice')
-    url = bitly_shorten(item.get('DetailPageURL'))
-    image = item.get('LargeImage/URL')
+    title = item.dig('ItemInfo', 'Title', 'DisplayValue')
+    price = item.dig('Offers', 'Listings').first.dig('Price', 'DisplayAmount')
+    url = item.dig('DetailPageURL')
+    image = item.dig('Images', 'Primary', 'Large', 'URL')
     {
       "type": "bubble",
       "hero": {
@@ -129,7 +130,7 @@ class LinebotsController < ApplicationController
                 "flex": 0
               }
             ]
-          }                      ]
+          }]
       },
       "footer": {
         "type": "box",

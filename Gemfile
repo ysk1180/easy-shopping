@@ -42,7 +42,7 @@ gem 'dotenv-rails'
 
 gem 'line-bot-api'
 
-gem 'amazon-ecs'
+gem 'vacuum'
 
 gem 'bitly'
 
