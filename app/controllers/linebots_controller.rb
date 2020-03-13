@@ -53,14 +53,14 @@ class LinebotsController < ApplicationController
     # ジャンルIDを取得する
     res1 = request.search_items(keywords: keyword,
                                 resources: ['BrowseNodeInfo.BrowseNodes']).to_h
-    browse_node_no = res1.dig('SearchResult','Items').first.dig('BrowseNodeInfo','BrowseNodes').first.dig('Id')
+    browse_node_no = res1.dig('SearchResult', 'Items').first.dig('BrowseNodeInfo', 'BrowseNodes').first.dig('Id')
 
     # ジャンルÎD内でのランキングを取得する
     # ジャンルIDを指定するとデフォルトで売上順になる（↓に記載）
     # https://docs.aws.amazon.com/AWSECommerceService/latest/DG/APPNDX_SortValuesArticle.html
     res2 = request.search_items(keywords: keyword,
-                                browse_node_id: browse_node_no, resources:
-                                ['ItemInfo.Title', 'Images.Primary.Large', 'Offers.Listings.Price']).to_h
+                                browse_node_id: browse_node_no,
+                                resources: ['ItemInfo.Title', 'Images.Primary.Large', 'Offers.Listings.Price']).to_h
     items = res2.dig('SearchResult', 'Items')
 
     make_reply_content(items)
