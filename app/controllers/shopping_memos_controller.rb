@@ -132,8 +132,6 @@ class ShoppingMemosController < ApplicationController
   end
 
   def create_message(things, amazon)
-    # デバックログ出力するために記述
-    Amazon::Ecs.debug = true if amazon
     [
       {
         "type": 'flex',
