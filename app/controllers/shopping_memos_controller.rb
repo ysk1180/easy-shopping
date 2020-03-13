@@ -189,25 +189,29 @@ class ShoppingMemosController < ApplicationController
 
   def create_content(thing, amazon)
     if amazon
-      res1 = Amazon::Ecs.item_search(
-        thing, # キーワード指定
-        search_index: 'All', # 抜きたいジャンルを指定
-        response_group: 'BrowseNodes',
-        country: 'jp'
-      )
-      browse_node_no = res1.items.first.get('BrowseNodes/BrowseNode/BrowseNodeId')
-      res2 = Amazon::Ecs.item_search(
-        thing,
-        browse_node: browse_node_no,
-        response_group: 'ItemAttributes, Images, Offers',
-        country: 'jp',
-        sort: 'salesrank' # ソート順を売上順に指定することでランキングとする
-      )
-      item = res2.items.first
-      title = item.get('ItemAttributes/Title')
-      price = choice_price(item.get('ItemAttributes/ListPrice/FormattedPrice'), item.get('OfferSummary/LowestNewPrice/FormattedPrice'))
-      url = bitly_shorten(item.get('DetailPageURL'))
-      image = item.get('LargeImage/URL')
+      request = Vacuum.new(marketplace: 'JP',
+                           access_key: ENV['AMAZON_API_ACCESS_KEY'],
+                           secret_key: ENV['AMAZON_API_SECRET_KEY'],
+                           partner_tag: ENV['ASSOCIATE_TAG'])
+
+      # ジャンルIDを取得する
+      res1 = request.search_items(keywords: keyword,
+                                  resources: ['BrowseNodeInfo.BrowseNodes']).to_h
+      browse_node_no = res1.dig('SearchResult', 'Items').first.dig('BrowseNodeInfo', 'BrowseNodes').first.dig('Id')
+
+      # ジャンルÎD内でのランキングを取得する
+      # ジャンルIDを指定するとデフォルトで売上順になる（↓に記載）
+      # https://docs.aws.amazon.com/AWSECommerceService/latest/DG/APPNDX_SortValuesArticle.html
+      res2 = request.search_items(keywords: keyword,
+                                  browse_node_id: browse_node_no,
+                                  resources: ['ItemInfo.Title', 'Images.Primary.Large', 'Offers.Listings.Price']).to_h
+      item = res2.dig('SearchResult', 'Items').first
+
+      title = item.dig('ItemInfo', 'Title', 'DisplayValue')
+      price = item.dig('Offers', 'Listings').first.dig('Price', 'DisplayAmount')
+      url = item.dig('DetailPageURL')
+      image = item.dig('Images', 'Primary', 'Large', 'URL')
+
       amazon_or_rakuten = 'Amazon'
     else
       RakutenWebService.configuration do |c|
