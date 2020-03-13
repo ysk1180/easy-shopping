@@ -195,14 +195,14 @@ class ShoppingMemosController < ApplicationController
                            partner_tag: ENV['ASSOCIATE_TAG'])
 
       # ジャンルIDを取得する
-      res1 = request.search_items(keywords: keyword,
+      res1 = request.search_items(keywords: thing,
                                   resources: ['BrowseNodeInfo.BrowseNodes']).to_h
       browse_node_no = res1.dig('SearchResult', 'Items').first.dig('BrowseNodeInfo', 'BrowseNodes').first.dig('Id')
 
       # ジャンルÎD内でのランキングを取得する
       # ジャンルIDを指定するとデフォルトで売上順になる（↓に記載）
       # https://docs.aws.amazon.com/AWSECommerceService/latest/DG/APPNDX_SortValuesArticle.html
-      res2 = request.search_items(keywords: keyword,
+      res2 = request.search_items(keywords: thing,
                                   browse_node_id: browse_node_no,
                                   resources: ['ItemInfo.Title', 'Images.Primary.Large', 'Offers.Listings.Price']).to_h
       item = res2.dig('SearchResult', 'Items').first
