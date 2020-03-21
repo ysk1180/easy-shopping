@@ -44,6 +44,4 @@ gem 'line-bot-api'
 
 gem 'vacuum'
 
-gem 'bitly'
-
 gem 'rakuten_web_service'

@@ -1,9 +1,6 @@
 # frozen_string_literal: true
 
 class ShoppingMemosController < ApplicationController
-  require 'line/bot'
-  require 'bitly'
-
   # callbackアクションのCSRFトークン認証を無効
   protect_from_forgery except: [:callback]
 
@@ -116,15 +113,6 @@ class ShoppingMemosController < ApplicationController
         }
       ]
     }
-  end
-
-  def bitly_shorten(url)
-    Bitly.use_api_version_3
-    Bitly.configure do |config|
-      config.api_version = 3
-      config.access_token = ENV['BITLY_ACCESS_TOKEN']
-    end
-    Bitly.client.shorten(url).short_url
   end
 
   def choice_price(amazon_price, other_price)
